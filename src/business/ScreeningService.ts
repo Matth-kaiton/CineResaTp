@@ -14,27 +14,27 @@ class ScreeningService {
     );
   }
 
-  async createScreening(
-    movie: string,
-    room: string,
-    startsAt: string,
-    price: number,
-    capacity: number,
-  ) {
-    const screening: Screening = {
-      id: "s" + Date.now(),
-      movie,
-      room,
-      startsAt: new Date(startsAt),
-      price,
-      capacity,
-    };
-    await this.ScreeningRepo.createScreening(screening);
-  }
+  // async createScreening(
+  //   movie: string,
+  //   room: string,
+  //   startsAt: string,
+  //   price: number,
+  //   capacity: number,
+  // ) {
+  //   const screening: Screening = {
+  //     id: "s" + Date.now(),
+  //     movie,
+  //     room,
+  //     startsAt: new Date(startsAt),
+  //     price,
+  //     capacity,
+  //   };
+  //   await this.ScreeningRepo.createScreening(screening);
+  // }
 
-  async deleteScreening(id: string) {
-    await this.ScreeningRepo.deleteScreening(id);
-  }
+  // async deleteScreening(id: string) {
+  //   await this.ScreeningRepo.deleteScreening(id);
+  // }
 }
 
 export default new ScreeningService();
