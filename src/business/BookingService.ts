@@ -54,7 +54,7 @@ class BookingService {
       createdAt: new Date(),
     };
 
-    await this.bookingRepo.createBooking(booking);
+    return await this.bookingRepo.createBooking(booking);
   }
 
   async cancelBooking(bookingId: string): Promise<void> {
