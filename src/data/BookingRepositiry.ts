@@ -12,8 +12,9 @@ class BookingRepository {
   }
 
   async createBooking(booking: Booking) {
-    this.db.bookings.push(booking);
+    await this.db.bookings.push(booking);
     writeDb(this.db);
+    return booking;
   }
 
   async cancelBooking(booking: Booking) {
@@ -24,6 +25,7 @@ class BookingRepository {
 
     this.db.bookings[index] = booking;
     writeDb(this.db);
+    return booking;
   }
 
   async findById(id: string) {

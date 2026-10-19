@@ -21,7 +21,7 @@ class ScreeningRepository {
   async countRemainingSeats(screening: Screening) {
     const NO_SEAT_TAKEN = 0;
 
-    const totalTakenSeats = this.db.bookings
+    const totalTakenSeats = await this.db.bookings
       .filter((b: Booking) => b.screeningId === screening.id)
       .reduce((sum: number, b: Booking) => sum + b.seats, NO_SEAT_TAKEN);
 
