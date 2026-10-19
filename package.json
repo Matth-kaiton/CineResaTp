@@ -1,0 +1,27 @@
+{
+  "name": "cineresa-legacy",
+  "version": "1.0.0",
+  "description": "CinéResa — version legacy à refactorer",
+  "main": "src/server.ts",
+  "scripts": {
+    "seed": "tsx scripts/seed.ts",
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "test": "vitest run --passWithNoTests",
+    "typecheck": "tsc"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.22.3"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.25",
+    "@types/node": "^26.6.4",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  },
+  "private": true
+}
