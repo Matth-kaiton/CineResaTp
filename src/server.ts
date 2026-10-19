@@ -4,6 +4,7 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import sendMail from "./datda/mailer.js";
+import { pay, refund } from "./datda/payment.js";
 
 const app = express();
 app.use(express.json());
@@ -83,8 +84,7 @@ app.post("/screenings/:id/bookings", async (req, res) => {
   let total = unit * seats;
   if (seats >= 4) total = Math.round(total * 0.9);
 
-  // paiement : appel au prestataire (simulé)
-  const paid = Math.random() > 0.05;
+  const paid = pay(total);
   if (!paid) return res.status(402).json({ error: "Paiement refusé" });
 
   const booking = {
