@@ -1,3 +1,7 @@
+# Audit
+
+## Routes
+
 ### GET /screenings ligne 23
 
 json retourné : un tableau des scéance à venir
@@ -97,6 +101,8 @@ retour json success
 ]
 ```
 
+### Résumé
+
 | ligne     | bloc code                | responsabilité                                                                                                                                                                                                                                                     |
 | --------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 23 - 43   | GET /screenings              | lecture de la bdd, recup des séances et calcule les places restantes                                                                                                                                                                                                   |
@@ -104,7 +110,7 @@ retour json success
 | 114 - 137 | DELETE /bookings/:id            | Annule une reservation Vérifie si l'id est valide si déja annuler et si plus de 2 heures avant le début de la scéance                                                                                                                                              |
 | 142 - 155 | GET /bookings?email=...                | récupère toute les reservation assosier à l'email donnée return le film si renseigné sinon "?" et la date de début si renségé sinon "null"                                                                                                                         |
 
-### Code Smells
+## Code Smells
 
 | Nom                        | ligne             | probème                                                                                                                                                                                                                                             |
 | -------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -114,3 +120,13 @@ retour json success
 | Id reservation             | 90                | enregistre l'id avec "b" et un timestamps si 2 personne clique sur réservation ene meme temps sur la meme scéance un problème peut survennir plus tard si annulation risque d'annulation de la mauvaise résa commbiné mail + timestamps plus sécure |
 | retour sans code http      | 42                | pas de code response 200 dans la d'un GET                                                                                                                                                                                                           |
 | Enum manquant              | 94, 96, 129       | les valeur son des string si une erreur de frappe impossible de faire des requete éfficacement utilisatation d'ENUM recommander                                                                                                                     |
+
+## SOLID
+
+| Lettre | Violation | Expliquation |
+| ------ | --------- | ------------ |
+| S | Oui | Toutes les fonctions sont dans un seul fichier et ont plusieurs responsabilités |
+| O | Oui | L'ajout ou la modification des traitements nécessite de modifier les routes et fonctions existantes |
+| L | Non applicable | Aucun héritage, car pas de poo |
+| I | Non applicable | Aucune interface, car pas de poo |
+| D | Oui | Les traitements accèdent directement à la db au lieu de dépendre d'une abstraction |
