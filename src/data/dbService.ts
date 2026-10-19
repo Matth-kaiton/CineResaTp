@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 
-const DB_FILE = path.join(__dirname, "..", "data", "db.json");
+const DB_FILE = path.join(__dirname, "..", "..", "data", "db.json");
 
 export function readDb(): any {
   return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));

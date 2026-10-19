@@ -9,7 +9,7 @@ class ScreeningService {
   }
 
   async getScreeningById(id: string): Promise<Screening | undefined> {
-    return this.getScreenings().then((screenings) =>
+    return await this.getScreenings().then((screenings) =>
       screenings.find((s: Screening) => s.id === id),
     );
   }
