@@ -8,6 +8,7 @@ class BookingRepository {
 
   async fectBookingForUser(mail: string) {
     const list = this.db.bookings.filter((b: any) => b.email === mail);
+    return list
   }
 
   async createBooking(
