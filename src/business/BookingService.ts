@@ -3,6 +3,7 @@ import BookingRepository from "../data/BookingRepositiry";
 import ScreeningRepository from "../data/ScreeningRepository";
 import ScreeningService from "./ScreeningService";
 import { UserStatus } from "../enum/UserStatuts";
+import { BookingStatus } from "../enum/BookingStatus";
 
 class BookingService {
   private bookingRepo = BookingRepository;
@@ -42,14 +43,18 @@ class BookingService {
     if (seats >= 4) {
       totalPrice = Math.round(totalPrice * 0.9);
     }
+    const booking: Booking = {
+      id: "b" + Date.now(),
+      screeningId: screening.id,
+      email: email,
+      seats: seats,
+      tariff: tarif,
+      total: totalPrice,
+      status: BookingStatus.CONFIRMED,
+      createdAt: new Date(),
+    };
 
-    await this.bookingRepo.createBooking(
-      screeningId,
-      email,
-      seats,
-      tarif,
-      totalPrice,
-    );
+    await this.bookingRepo.createBooking(booking);
   }
 
   async cancelBooking(bookingId: string): Promise<void> {
@@ -57,7 +62,7 @@ class BookingService {
     if (!booking) {
       throw new Error("Booking not found");
     }
-    await this.bookingRepo.deleteBooking(booking);
+    await this.bookingRepo.cancelBooking(booking);
   }
 
   async myBookings(email: string): Promise<Booking[]> {
