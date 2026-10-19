@@ -5,7 +5,7 @@ import ScreeningService from "./ScreeningService";
 import ErrorResponse from "../types/errorResponse";
 import { UserStatus } from "../enum/UserStatuts";
 import { BookingStatus } from "../enum/BookingStatus";
-import { pay, caluclatePrice } from "../data/payment";
+import { pay, calculatePrice } from "../data/payment";
 import sendMail from "../data/mailer";
 
 class BookingService {
@@ -42,7 +42,7 @@ class BookingService {
       throw new ErrorResponse("Not enough seats available", 409);
     }
 
-    const totalPrice = caluclatePrice(screening.price, seats, tarif);
+    const totalPrice = calculatePrice(screening.price, seats, tarif);
     const paid = pay(totalPrice);
 
     if (!paid) {
