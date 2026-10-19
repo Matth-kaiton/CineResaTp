@@ -5,19 +5,10 @@ import fs from "fs";
 import path from "path";
 import sendMail from "./datda/mailer.js";
 import { pay, refund } from "./datda/payment.js";
+import { readDb, writeDb } from "./data/dbService";
 
 const app = express();
 app.use(express.json());
-
-const DB_FILE = path.join(__dirname, "..", "data", "db.json");
-
-function readDb(): any {
-  return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
-}
-
-function writeDb(db: any) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
-}
 
 // ---------------------------------------------------------------------------
 // GET /screenings : liste des séances à venir avec le nombre de places restantes
