@@ -13,7 +13,7 @@ export function refund(amount: number) {
 const STUDENT_DISCOUNT = 0.7;
 const GROUP_DISCOUNT = 0.9;
 
-export function caluclatePrice(
+export function calculatePrice(
   unitPrice: number,
   seats: number,
   tarif: UserStatus,
