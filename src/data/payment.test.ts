@@ -4,7 +4,7 @@ import { UserStatus } from "../enum/UserStatuts";
 
 describe("calculatePrice", () => {
   it("should calculate standard price correctly without discounts", () => {
-    const price = calculatePrice(10, 2, UserStatus.STANDARD);
+    const price = calculatePrice(10, 2, UserStatus.NORMAL);
     expect(price).toBe(20);
   });
 
@@ -15,7 +15,7 @@ describe("calculatePrice", () => {
   });
 
   it("should apply group discount when seats >= 4", () => {
-    const price = calculatePrice(10, 4, UserStatus.STANDARD);
+    const price = calculatePrice(10, 4, UserStatus.NORMAL);
     // 10 * 4 = 40, 40 * 0.9 = 36
     expect(price).toBe(36);
   });
