@@ -130,3 +130,31 @@ retour json success
 | L | Non applicable | Aucun héritage, car pas de poo |
 | I | Non applicable | Aucune interface, car pas de poo |
 | D | Oui | Les traitements accèdent directement à la db au lieu de dépendre d'une abstraction |
+
+## Dépendances (POST /screenings/:id/bookings)
+
+### Graphe des dépendances
+
+Toutes les dépendances sont appelées directement au sein de la route `POST /screenings/:id/bookings` de `server.ts` :
+
+```mermaid
+flowchart TD
+    Route["Route Handler<br/>POST /screenings/:id/bookings<br/>(server.ts)"]
+
+    %% Entrées / Sorties HTTP
+    Route -->|"req (params.id, body.email, body.seats)<br/>res (status, json)"| Express["Express / HTTP<br/>(req, res)"]
+
+    %% Temps
+    Route -->|"new Date()<br/>- Vérifie si séance commencée<br/>- createdAt (ISO string)"| TimeDate["Le Temps (Horloge)<br/>new Date()"]
+    Route -->|"Date.now()<br/>- Génération de l'ID ('b' + timestamp)"| TimeNow["Le Temps (Timestamp)<br/>Date.now()"]
+
+    %% Disque
+    Route -->|"fs.readFileSync()<br/>fs.writeFileSync()<br/>(accès direct à data/db.json)"| FS["Le Disque (Système de fichiers)<br/>fs (Node.js)"]
+
+    %% Hasard
+    Route -->|"Math.random() > 0.05<br/>(simulation de paiement en direct)"| Random["Le Hasard (Aléa)<br/>Math.random()"]
+
+    %% Console
+    Route -->|"console.log('[SMTP] ...')<br/>(simulation d'envoi de mail en direct)"| Console["La Console (Sortie standard)<br/>console.log()"]
+```
+
