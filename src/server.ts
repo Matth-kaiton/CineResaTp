@@ -3,6 +3,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import sendMail from "./datda/mailer.js";
 
 const app = express();
 app.use(express.json());
@@ -100,10 +101,7 @@ app.post("/screenings/:id/bookings", async (req, res) => {
   writeDb(db);
 
   // envoi du mail de confirmation
-  console.log(
-    `[SMTP] To: ${email} — Votre réservation ${booking.id} pour "${s.movie}" ` +
-      `(${seats} place(s), ${(total / 100).toFixed(2)} €) est confirmée.`,
-  );
+  sendMail(email, `Votre réservation ${booking.id} pour "${s.movie}" (${seats} place(s), ${(total / 100).toFixed(2)} €) est confirmée.`);
 
   res.status(201).json(booking);
 });
@@ -130,9 +128,7 @@ app.delete("/bookings/:id", (req, res) => {
   b.cancelledAt = new Date().toISOString();
   writeDb(db);
 
-  console.log(
-    `[SMTP] To: ${b.email} — Votre réservation ${b.id} a été annulée. Remboursement : ${(b.total / 100).toFixed(2)} €`,
-  );
+  sendMail(b.email, `Votre réservation ${b.id} a été annulée. Remboursement : ${(b.total / 100).toFixed(2)} €`);
   res.json(b);
 });
 
