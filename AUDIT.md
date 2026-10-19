@@ -1,6 +1,6 @@
 ### GET /screenings ligne 23
 
-json retourné un tableau des scéance a venir
+json retourné : un tableau des scéance à venir
 
 retour json success
 
@@ -19,9 +19,9 @@ retour json success
 
 ### POST /screenings/:id/bookings ligne 49
 
-Reserve une place besoin d'un format de mail valide
-que la séance est des place restante et quel n'a pas commencé
-envoie également le mail de confirmation
+Réserve une place. Besoin d'un format de mail valide,
+que la séance ait des places restantes, et qu'elle n'ait pas commencé.
+Envoie également le mail de confirmation.
 
 payload attendu
 
@@ -50,9 +50,9 @@ retour json success
 
 ### DELETE /bookings/:id
 
-permet d'annuler une réservation
-temps que l'annulation se fait plus de 2 heure avant la séance
-vérifie que la reservation existe et n'est pas déja annulé
+Permet d'annuler une réservation
+tant que l'annulation se fait plus de 2 heures avant la séance.
+Vérifie que la réservation existe et n'est pas déja annulée.
 
 retour json success
 
@@ -70,14 +70,14 @@ retour json success
 }
 ```
 
-### GET /bookings?email=...
+### GET /bookings?email=
 
-récupère le tableau des reservationn d'un utilisateur via son mail en params
-affiche totue les reservation annuler ou active
+Récupère le tableau des reservations d'un utilisateur via son mail en params.
+Affiche toutes les réservation annulées ou actives.
 
 retour json success
 
-/bookings?email=matthias@ynov.com
+/bookings?email=<matthias@ynov.com>
 
 ```json
 [
@@ -99,10 +99,10 @@ retour json success
 
 | ligne     | bloc code                | responsabilité                                                                                                                                                                                                                                                     |
 | --------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 23 - 43   | /screenings              | lecture de la bdd recup des séance et calcule les place restante                                                                                                                                                                                                   |
-| 49 - 109  | /screenings/:id/bookings | Crée un reservastion pour une scéance vérifie les donné personnele de la reservation le nombre de place disponible ainsi que le nombre de place maximun par reservation, si la séance à déja commencer pas de resercvation également calcule du prix total à payer |
-| 114 - 137 | /bookings/:id            | Annule une reservation Vérifie si l'id est valide si déja annuler et si plus de 2 heures avant le début de la scéance                                                                                                                                              |
-| 142 - 155 | /bookings                | récupère toute les reservation assosier à l'email donnée return le film si renseigné sinon "?" et la date de début si renségé sinon "null"                                                                                                                         |
+| 23 - 43   | GET /screenings              | lecture de la bdd, recup des séances et calcule les places restantes                                                                                                                                                                                                   |
+| 49 - 109  | POST /screenings/:id/bookings | Crée un reservastion pour une scéance vérifie les donné personnele de la reservation le nombre de place disponible ainsi que le nombre de place maximun par reservation, si la séance à déja commencer pas de resercvation également calcule du prix total à payer |
+| 114 - 137 | DELETE /bookings/:id            | Annule une reservation Vérifie si l'id est valide si déja annuler et si plus de 2 heures avant le début de la scéance                                                                                                                                              |
+| 142 - 155 | GET /bookings?email=...                | récupère toute les reservation assosier à l'email donnée return le film si renseigné sinon "?" et la date de début si renségé sinon "null"                                                                                                                         |
 
 ### Code Smells
 
