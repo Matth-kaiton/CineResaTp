@@ -5,6 +5,8 @@ import ScreeningService from "./ScreeningService";
 import ErrorResponse from "../types/errorResponse";
 import { UserStatus } from "../enum/UserStatuts";
 import { BookingStatus } from "../enum/BookingStatus";
+import { pay, caluclatePrice } from "../data/payment";
+import sendMail from "../data/mailer";
 
 class BookingService {
   private bookingRepo = BookingRepository;
@@ -40,14 +42,17 @@ class BookingService {
       throw new ErrorResponse("Not enough seats available", 409);
     }
 
-    const unitPrice = screening.price;
-    let totalPrice = unitPrice * seats;
-    if (tarif === UserStatus.STUDENT) {
-      totalPrice = Math.round(totalPrice * 0.7);
+    const totalPrice = caluclatePrice(screening.price, seats, tarif);
+    const paid = pay(totalPrice);
+
+    if (!paid) {
+      throw new ErrorResponse("Payment failed", 402);
     }
-    if (seats >= 4) {
-      totalPrice = Math.round(totalPrice * 0.9);
-    }
+    sendMail(
+      email,
+      `Your booking for ${screening.movie} is confirmed. Total price: ${totalPrice}`,
+    );
+
     const booking: Booking = {
       id: "b" + Date.now(),
       screeningId: screening.id,
