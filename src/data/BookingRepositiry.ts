@@ -7,7 +7,7 @@ class BookingRepository {
   private db = readDb();
 
   async fectBookingForUser(mail: string) {
-    const list = this.db.bookings.filter((b: any) => b.email === mail);
+    const list = this.db.bookings.filter((b: Booking) => b.email === mail);
   }
 
   async createBooking(
