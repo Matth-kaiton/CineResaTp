@@ -3,8 +3,8 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import sendMail from "./datda/mailer.js";
-import { pay, refund } from "./datda/payment.js";
+import sendMail from "./data/mailer.js";
+import { pay, refund } from "./data/payment.js";
 import { readDb, writeDb } from "./data/dbService";
 
 const app = express();
