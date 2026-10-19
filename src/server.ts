@@ -58,7 +58,9 @@ app.post("/screenings/:id/bookings", async (req, res) => {
 
   const seats = Number(req.body.seats);
   if (!Number.isInteger(seats) || seats < 1 || seats > 6) {
-    return res.status(400).json({ error: "Entre 1 et 6 places par réservation" });
+    return res
+      .status(400)
+      .json({ error: "Entre 1 et 6 places par réservation" });
   }
 
   if (new Date(s.startsAt) <= new Date()) {
@@ -100,7 +102,7 @@ app.post("/screenings/:id/bookings", async (req, res) => {
   // envoi du mail de confirmation
   console.log(
     `[SMTP] To: ${email} — Votre réservation ${booking.id} pour "${s.movie}" ` +
-      `(${seats} place(s), ${(total / 100).toFixed(2)} €) est confirmée.`
+      `(${seats} place(s), ${(total / 100).toFixed(2)} €) est confirmée.`,
   );
 
   res.status(201).json(booking);
@@ -113,19 +115,24 @@ app.delete("/bookings/:id", (req, res) => {
   const db = readDb();
   const b = db.bookings.find((x: any) => x.id === req.params.id);
   if (!b) return res.status(404).json({ error: "Réservation introuvable" });
-  if (b.status === "CANCELLED") return res.status(409).json({ error: "Déjà annulée" });
+  if (b.status === "CANCELLED")
+    return res.status(409).json({ error: "Déjà annulée" });
 
   const s = db.screenings.find((x: any) => x.id === b.screeningId);
   const diff = new Date(s.startsAt).getTime() - new Date().getTime();
   if (diff < 2 * 60 * 60 * 1000) {
-    return res.status(409).json({ error: "Annulation impossible moins de 2h avant la séance" });
+    return res
+      .status(409)
+      .json({ error: "Annulation impossible moins de 2h avant la séance" });
   }
 
   b.status = "CANCELLED";
   b.cancelledAt = new Date().toISOString();
   writeDb(db);
 
-  console.log(`[SMTP] To: ${b.email} — Votre réservation ${b.id} a été annulée. Remboursement : ${(b.total / 100).toFixed(2)} €`);
+  console.log(
+    `[SMTP] To: ${b.email} — Votre réservation ${b.id} a été annulée. Remboursement : ${(b.total / 100).toFixed(2)} €`,
+  );
   res.json(b);
 });
 
@@ -138,14 +145,20 @@ app.get("/bookings", (req, res) => {
   res.json(
     list.map((b: any) => {
       const s = db.screenings.find((x: any) => x.id === b.screeningId);
-      return { ...b, movie: s ? s.movie : "?", startsAt: s ? s.startsAt : null };
-    })
+      return {
+        ...b,
+        movie: s ? s.movie : "?",
+        startsAt: s ? s.startsAt : null,
+      };
+    }),
   );
 });
 
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`CinéResa legacy sur http://localhost:${PORT}`));
+  app.listen(PORT, () =>
+    console.log(`CinéResa legacy sur http://localhost:${PORT}`),
+  );
 }
 
 export default app;
