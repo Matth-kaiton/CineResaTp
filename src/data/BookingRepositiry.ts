@@ -7,33 +7,22 @@ class BookingRepository {
   private db = readDb();
 
   async fectBookingForUser(mail: string) {
-    const list = this.db.bookings.filter((b: Booking) => b.email === mail);
-    return list
+    const result = this.db.bookings.filter((b: Booking) => b.email === mail);
+    return result;
   }
 
-  async createBooking(
-    screeningId: string,
-    email: string,
-    seats: number,
-    tarif: UserStatus = UserStatus.NORMAL,
-    total: number,
-  ) {
-    const booking = {
-      id: "b" + Date.now(),
-      screeningId: screeningId,
-      email: email,
-      seats: seats,
-      tariff: tarif,
-      total: total,
-      status: BookingStatus.CONFIRMED,
-      createdAt: new Date().toISOString(),
-    };
+  async createBooking(booking: Booking) {
     this.db.bookings.push(booking);
     writeDb(this.db);
   }
 
-  async deleteBooking(booking: Booking) {
+  async cancelBooking(booking: Booking) {
     booking.status = BookingStatus.CANCELLED;
+    const index = this.db.bookings.findIndex(
+      (b: Booking) => b.id === booking.id,
+    );
+
+    this.db.bookings[index] = booking;
     writeDb(this.db);
   }
 
