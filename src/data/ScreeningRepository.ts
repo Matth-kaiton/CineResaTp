@@ -11,21 +11,8 @@ class ScreeningRepository {
 
     for (const s of this.db.screenings) {
       if (new Date(s.startsAt) < now) continue;
-      let taken = 0;
 
-      for (const b of this.db.bookings) {
-        if (b.screeningId === s.id && b.status === "CONFIRMED")
-          taken += b.seats;
-      }
-
-      result.push({
-        id: s.id,
-        movie: s.movie,
-        room: s.room,
-        startsAt: s.startsAt,
-        price: s.price,
-        remaining: s.capacity - taken,
-      });
+      result.push(s);
     }
 
     return result;
