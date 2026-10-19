@@ -169,3 +169,16 @@ Aucune dépendance ne peut être remplacée sans modifier le code : il n'y a auc
 | Console (`console.log`) | Non | Appel direct à `console.log()` dans la route pour l'email |
 | Disque (`fs` / `db.json`) | Non | Lecture et écriture directes du fichier avec `fs` |
 | Express (`req`, `res`) | Non | Logique métier directement liée aux objets `req` et `res` |
+
+## Règles métier testables vs impossibles (sans serveur ni db.json)
+
+### Règles testables sans démarrer le serveur ni écrire dans `data/db.json`
+
+- **Calcul du prix et des réductions (`caluclatePrice`)** : Tests unitaires possibles pour toutes les combinaisons de tarifs (STUDENT / STANDARD) et de remises de groupe ($\ge 4$ places) via Vitest, sans démarrer Express ni toucher à `data/db.json`.
+
+### Règles impossibles à tester sans démarrer le serveur ni écrire dans `data/db.json`
+
+- **Création et annulation de réservations** :
+  - **Vérification des dates et délais** (`startsAt` vs `new Date()`, règle des 2h) : Horloge système en dur.
+  - **Persistance et stock** : Lecture/écriture directes du fichier `data/db.json` via `fs`.
+  - **Paiement et notifications** (`pay`, `mailer`) : Aléa non contrôlable (`Math.random()`).
