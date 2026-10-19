@@ -8,11 +8,11 @@ class ScreeningService {
     return this.ScreeningRepo.fectAllScreening();
   }
 
-  // async getScreeningById(id: string): Promise<Screening | undefined> {
-  //   return this.getScreenings().then((screenings) =>
-  //     screenings.find((s: Screening) => s.id === id),
-  //   );
-  // }
+  async getScreeningById(id: string): Promise<Screening | undefined> {
+    return this.getScreenings().then((screenings) =>
+      screenings.find((s: Screening) => s.id === id),
+    );
+  }
 
   // async createScreening(
   //   movie: string,
