@@ -10,12 +10,12 @@ export class ScreeningService implements IScreening {
     return this.screeningRepo.getScreenings();
   }
 
-  async getScreeningById(id: string): Promise<Screening> {
+  async getScreeningById(id: string): Promise<Screening | null> {
     const screening = await this.screeningRepo.getById(id);
-    if (!screening) {
-      throw new ErrorResponse("Screening not found", 404);
+    if (screening) {
+      return screening;
     }
-    return screening;
+    return null;
   }
 
   // async createScreening(
