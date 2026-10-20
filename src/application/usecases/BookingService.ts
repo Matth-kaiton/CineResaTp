@@ -7,6 +7,7 @@ import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
 import Mailer from "../../adapters/out/notification/mailer";
+import Payment from "../../adapters/out/payment/payment";
 
 export class BookingService implements IBooking {
   constructor(
@@ -14,6 +15,7 @@ export class BookingService implements IBooking {
     private screeningRepo: ScreeningRepositoryPort,
     private bookingRepo: BookingRepositoryPort,
     private mailer: Mailer,
+    private payment: Payment
   ) {}
 
   async makeBooking(
@@ -46,7 +48,7 @@ export class BookingService implements IBooking {
     }
 
     const totalPrice = calculatePrice(screening.price, seats, tarif);
-    const paid = pay(totalPrice);
+    const paid = await this.payment.pay(totalPrice);
 
     if (!paid) {
       throw new ErrorResponse("Payment failed", 402);
