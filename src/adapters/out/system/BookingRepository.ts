@@ -1,24 +1,22 @@
 import { readDb, writeDb } from "./dbService";
-import { UserStatus } from "../enum/UserStatuts";
-import { BookingStatus } from "../enum/BookingStatus";
-import { Booking } from "../types/Booking";
+import { Booking } from "../../../domain/Booking";
+import { BookingRepositoryPort } from "../../../application/ports/out/BookingRepositoryPort";
 
-class BookingRepository {
+class BookingRepository implements BookingRepositoryPort {
   private db = readDb();
 
-  async fectBookingForUser(mail: string) {
+  async getAllByMail(mail: string) {
     const result = this.db.bookings.filter((b: Booking) => b.email === mail);
     return result;
   }
 
-  async createBooking(booking: Booking) {
+  async create(booking: Booking) {
     await this.db.bookings.push(booking);
     writeDb(this.db);
     return booking;
   }
 
-  async cancelBooking(booking: Booking) {
-    booking.status = BookingStatus.CANCELLED;
+  async update(booking: Booking) {
     const index = this.db.bookings.findIndex(
       (b: Booking) => b.id === booking.id,
     );
@@ -28,7 +26,7 @@ class BookingRepository {
     return booking;
   }
 
-  async findById(id: string) {
+  async getById(id: string) {
     const b = this.db.bookings.find((x: any) => x.id === id);
     if (!b) return null;
     return b;

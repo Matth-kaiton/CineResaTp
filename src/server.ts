@@ -1,17 +1,27 @@
 // CinéResa — API de réservation de places de cinéma
 // Version "historique" : tout est dans ce fichier. Ça marche… tant qu'on n'y touche pas.
 import express from "express";
-import screeningRoutes from "./presentation/screening.routes";
-import bookingRoutes from "./presentation/booking.routes";
-import sendMail from "./data/mailer.js";
-import { errorHandler } from "./types/errorHandler";
+import { screeningRouter } from "./adapters/in/http/screening.routes";
+import { bookingRouter } from "./adapters/in/http/booking.routes";
+import { errorHandler } from "./adapters/in/http/errorHandler";
+import { ScreeningService } from "./application/usecases/ScreeningService";
+import ScreeningRepository from "./adapters/out/system/ScreeningRepository";
+import BookingRepository from "./adapters/out/system/BookingRepository";
+import { BookingService } from "./application/usecases/BookingService";
 
 const app = express();
 app.use(express.json());
 
-app.use("/screenings", screeningRoutes);
+const screeningService = new ScreeningService(ScreeningRepository);
+const bookingService = new BookingService(
+  screeningService,
+  ScreeningRepository,
+  BookingRepository,
+);
 
-app.use("/bookings", bookingRoutes);
+app.use("/screenings", screeningRouter(screeningService, bookingService));
+
+app.use("/bookings", bookingRouter(bookingService));
 
 // ---------------------------------------------------------------------------
 // DELETE /bookings/:id : annuler (possible jusqu'à 2h avant la séance)

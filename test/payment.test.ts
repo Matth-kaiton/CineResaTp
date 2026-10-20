@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { calculatePrice } from "./payment";
-import { UserStatus } from "../enum/UserStatuts";
+import { UserStatus } from "../src/domain/enum/UserStatuts";
 
 describe("calculatePrice", () => {
   it("should calculate standard price correctly without discounts", () => {

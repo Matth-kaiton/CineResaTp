@@ -1,4 +1,4 @@
-export default class ErroResponse extends Error {
+export default class ErrorResponse extends Error {
   public statusCode: number;
   constructor(message: string, statusCode: number) {
     super(message);

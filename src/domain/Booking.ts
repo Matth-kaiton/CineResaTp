@@ -1,5 +1,5 @@
-import { BookingStatus } from "../enum/BookingStatus";
-import { UserStatus } from "../enum/UserStatuts";
+import { BookingStatus } from "./enum/BookingStatus";
+import { UserStatus } from "./enum/UserStatuts";
 
 export type Booking = {
   id: string;

@@ -1,17 +1,18 @@
-import { Booking } from "../types/Booking";
-import BookingRepository from "../data/BookingRepositiry";
-import ScreeningRepository from "../data/ScreeningRepository";
-import ScreeningService from "./ScreeningService";
-import ErrorResponse from "../types/errorResponse";
-import { UserStatus } from "../enum/UserStatuts";
-import { BookingStatus } from "../enum/BookingStatus";
-import { pay, calculatePrice } from "../data/payment";
-import sendMail from "../data/mailer";
+import { Booking } from "../../domain/Booking";
+import ErrorResponse from "../../domain/errorResponse";
+import { UserStatus } from "../../domain/enum/UserStatuts";
+import { BookingStatus } from "../../domain/enum/BookingStatus";
+import IBooking from "../ports/in/IBooking";
+import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
+import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
+import { ScreeningService } from "./ScreeningService";
 
-class BookingService {
-  private bookingRepo = BookingRepository;
-  private screeningService = ScreeningService;
-  private screeningRepo = ScreeningRepository;
+export class BookingService implements IBooking {
+  constructor(
+    private screeningService: ScreeningService,
+    private screeningRepo: ScreeningRepositoryPort,
+    private bookingRepo: BookingRepositoryPort,
+  ) {}
 
   async makeBooking(
     screeningId: string,
@@ -64,11 +65,11 @@ class BookingService {
       createdAt: new Date(),
     };
 
-    return await this.bookingRepo.createBooking(booking);
+    return await this.bookingRepo.create(booking);
   }
 
   async cancelBooking(bookingId: string): Promise<Booking> {
-    const booking: Booking | null = await this.bookingRepo.findById(bookingId);
+    const booking = await this.bookingRepo.getById(bookingId);
     if (!booking) {
       throw new Error("Booking not found");
     }
@@ -81,8 +82,7 @@ class BookingService {
       );
     }
 
-    await this.bookingRepo.cancelBooking(booking);
-    return booking;
+    return await this.bookingRepo.update(booking);
   }
 
   async myBookings(email: string | null): Promise<Booking[]> {
@@ -90,8 +90,6 @@ class BookingService {
       throw new ErrorResponse("email not send", 400);
     }
 
-    return this.bookingRepo.fectBookingForUser(email);
+    return await this.bookingRepo.getAllByMail(email);
   }
 }
-
-export default new BookingService();

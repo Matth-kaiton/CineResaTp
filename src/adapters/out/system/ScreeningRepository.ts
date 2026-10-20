@@ -1,11 +1,13 @@
-import { readDb, writeDb } from "./dbService";
-import { Screening } from "../types/Screening";
-import { Booking } from "../types/Booking";
+import { readDb } from "./dbService";
+import { Screening } from "../../../domain/Screening";
+import { Booking } from "../../../domain/Booking";
+import { ScreeningRepositoryPort } from "../../../application/ports/out/ScreeningRepositoryPort";
 
-class ScreeningRepository {
+class ScreeningRepository implements ScreeningRepositoryPort {
+  constructor() {}
   private db = readDb();
 
-  async fectAllScreening() {
+  async getScreenings() {
     const now = new Date();
     const result = [];
 
@@ -16,6 +18,13 @@ class ScreeningRepository {
     }
 
     return result;
+  }
+
+  async getById(id: string): Promise<Screening> {
+    const screening = this.db.screenings.findById(
+      (s: Screening) => s.id === id,
+    );
+    return screening;
   }
 
   async countRemainingSeats(screening: Screening) {

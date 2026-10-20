@@ -1,7 +1,7 @@
 // src/presentation/middlewares/errorHandler.ts
 import { Request, Response, NextFunction } from "express";
-import ErroResponse from "./errorResponse";
-import { apiResponse } from "../api/apiResponse";
+import ErrorResponse from "../../../domain/errorResponse";
+import { apiResponse } from "./apiResponse";
 
 export function errorHandler(
   err: any,
@@ -10,7 +10,7 @@ export function errorHandler(
   next: NextFunction,
 ) {
   //gestion erreur perso
-  if (err instanceof ErroResponse) {
+  if (err instanceof ErrorResponse) {
     return apiResponse.error(res, err.message, err.statusCode);
   }
 
