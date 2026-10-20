@@ -54,12 +54,8 @@ export class BookingService implements IBooking {
     if (!paid) {
       throw new ErrorResponse("Payment failed", 402);
     }
-    await this.mailer.sendNotification(
-      email,
-      `Your booking for ${screening.movie} is confirmed. Total price: ${totalPrice}`,
-    );
 
-    const booking: Booking = {
+    const booking: Booking = await this.bookingRepo.create({
       id: "b" + Date.now(),
       screeningId: screening.id,
       email: email,
@@ -68,9 +64,14 @@ export class BookingService implements IBooking {
       total: totalPrice,
       status: BookingStatus.CONFIRMED,
       createdAt: new Date(),
-    };
+    });
 
-    return await this.bookingRepo.create(booking);
+    await this.mailer.sendNotification(
+      email,
+      `Your booking for ${screening.movie} is confirmed. Total price: ${totalPrice}`,
+    );
+
+    return booking;
   }
 
   async cancelBooking(bookingId: string): Promise<Booking> {
