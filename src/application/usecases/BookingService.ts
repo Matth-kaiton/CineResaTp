@@ -26,10 +26,10 @@ export class BookingService implements IBooking {
     tarif: UserStatus = UserStatus.NORMAL,
   ): Promise<Booking> {
     const screening = await this.screeningService.getScreeningById(screeningId);
-    if (!screening) {
-      throw new ErrorResponse("Screening not found or pass", 404);
-    }
 
+    if (!screening) {
+      throw new ErrorResponse("Screening not found", 404);
+    }
     if (!seats || seats < 1 || seats > 6) {
       throw new ErrorResponse("Seats must be between 1 and 6", 400);
     }

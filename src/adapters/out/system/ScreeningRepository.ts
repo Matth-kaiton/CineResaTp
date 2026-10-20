@@ -21,9 +21,7 @@ class ScreeningRepository implements ScreeningRepositoryPort {
   }
 
   async getById(id: string): Promise<Screening> {
-    const screening = this.db.screenings.findById(
-      (s: Screening) => s.id === id,
-    );
+    const screening = this.db.screenings.find((s: Screening) => s.id === id);
     return screening;
   }
 
