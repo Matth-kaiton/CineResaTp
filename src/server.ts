@@ -8,6 +8,7 @@ import { ScreeningService } from "./application/usecases/ScreeningService";
 import ScreeningRepository from "./adapters/out/system/ScreeningRepository";
 import BookingRepository from "./adapters/out/system/BookingRepository";
 import { BookingService } from "./application/usecases/BookingService";
+import Mailer from "./adapters/out/notification/mailer";
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ const bookingService = new BookingService(
   screeningService,
   ScreeningRepository,
   BookingRepository,
+  new Mailer
 );
 
 app.use("/screenings", screeningRouter(screeningService, bookingService));

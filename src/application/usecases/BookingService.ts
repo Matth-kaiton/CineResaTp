@@ -6,12 +6,14 @@ import IBooking from "../ports/in/IBooking";
 import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
+import Mailer from "../../adapters/out/notification/mailer";
 
 export class BookingService implements IBooking {
   constructor(
     private screeningService: ScreeningService,
     private screeningRepo: ScreeningRepositoryPort,
     private bookingRepo: BookingRepositoryPort,
+    private mailer: Mailer,
   ) {}
 
   async makeBooking(
@@ -49,7 +51,7 @@ export class BookingService implements IBooking {
     if (!paid) {
       throw new ErrorResponse("Payment failed", 402);
     }
-    sendMail(
+    await this.mailer.sendNotification(
       email,
       `Your booking for ${screening.movie} is confirmed. Total price: ${totalPrice}`,
     );
