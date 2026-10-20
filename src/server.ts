@@ -5,10 +5,11 @@ import { screeningRouter } from "./adapters/in/http/screening.routes";
 import { bookingRouter } from "./adapters/in/http/booking.routes";
 import { errorHandler } from "./adapters/in/http/errorHandler";
 import { ScreeningService } from "./application/usecases/ScreeningService";
+import { BookingService } from "./application/usecases/BookingService";
 import ScreeningRepository from "./adapters/out/system/ScreeningRepository";
 import BookingRepository from "./adapters/out/system/BookingRepository";
-import { BookingService } from "./application/usecases/BookingService";
 import Mailer from "./adapters/out/notification/mailer";
+import Payment from "./adapters/out/payment/payment";
 
 const app = express();
 app.use(express.json());
@@ -18,7 +19,8 @@ const bookingService = new BookingService(
   screeningService,
   ScreeningRepository,
   BookingRepository,
-  new Mailer
+  Mailer,
+  Payment,
 );
 
 app.use("/screenings", screeningRouter(screeningService, bookingService));

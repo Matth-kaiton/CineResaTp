@@ -6,8 +6,8 @@ import IBooking from "../ports/in/IBooking";
 import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
-import Mailer from "../../adapters/out/notification/mailer";
-import Payment from "../../adapters/out/payment/payment";
+import { NotifyPort } from "../ports/out/NotifyPort";
+import { PaymentPort } from "../ports/out/PaymentPort";
 import { calculatePrice } from "../../domain/utils/price";
 
 export class BookingService implements IBooking {
@@ -15,8 +15,8 @@ export class BookingService implements IBooking {
     private screeningService: ScreeningService,
     private screeningRepo: ScreeningRepositoryPort,
     private bookingRepo: BookingRepositoryPort,
-    private mailer: Mailer,
-    private payment: Payment
+    private mailer: NotifyPort,
+    private payment: PaymentPort,
   ) {}
 
   async makeBooking(
