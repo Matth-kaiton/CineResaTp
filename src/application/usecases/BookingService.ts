@@ -8,6 +8,7 @@ import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
 import Mailer from "../../adapters/out/notification/mailer";
 import Payment from "../../adapters/out/payment/payment";
+import { calculatePrice } from "../../domain/utils/price";
 
 export class BookingService implements IBooking {
   constructor(

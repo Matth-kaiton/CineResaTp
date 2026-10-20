@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { calculatePrice } from "./payment";
+import { calculatePrice } from "../src/domain/utils/price";
 import { UserStatus } from "../src/domain/enum/UserStatuts";
 
 describe("calculatePrice", () => {
