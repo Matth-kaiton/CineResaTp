@@ -10,7 +10,7 @@ export const bookingRouter = (bookingService: BookingService) => {
     try {
       const email = req.query.email as string | null;
 
-      const bookings = await bookingService.myBookings(email);
+      const bookings = await bookingService.listMyBookings(email);
 
       return apiResponse.success(res, bookings);
     } catch (error) {

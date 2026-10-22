@@ -11,7 +11,7 @@ export const screeningRouter = (
 
   router.get("/", async (req, res, next) => {
     try {
-      const screenings = await screeningService.getScreenings();
+      const screenings = await screeningService.listUpcomingScreenings();
 
       return apiResponse.success(res, screenings);
     } catch (error) {
