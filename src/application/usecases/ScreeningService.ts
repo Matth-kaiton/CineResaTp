@@ -1,5 +1,5 @@
 import ErrorResponse from "../../domain/errorResponse";
-import { Screening } from "../../domain/Screening";
+import { Screening } from "../../domain/types/Screening";
 import { GetScreeningById } from "../ports/in/GetScreeningById";
 import ListUpcomingScreenings from "../ports/in/ListUpcomingScreenings";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";

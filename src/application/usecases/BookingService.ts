@@ -1,4 +1,4 @@
-import { Booking } from "../../domain/Booking";
+import { Booking } from "../../domain/types/Booking";
 import ErrorResponse from "../../domain/errorResponse";
 import { UserStatus } from "../../domain/enum/UserStatuts";
 import { BookingStatus } from "../../domain/enum/BookingStatus";
@@ -86,11 +86,7 @@ export class BookingService
     if (booking.status === BookingStatus.CANCELLED) {
       throw new Error("Booking is already cancelled");
     }
-    if (new Date(booking.createdAt).getTime() + 120 * 60 * 1000 < Date.now()) {
-      throw new Error(
-        "Booking can only be cancelled within 2 hours of screening start time",
-      );
-    }
+    
 
     return await this.bookingRepo.update(booking);
   }

@@ -1,4 +1,4 @@
-import { Screening } from "../../../domain/Screening";
+import { Screening } from "../../../domain/types/Screening";
 
 export interface ScreeningRepositoryPort {
   listUpcomingScreenings(): Promise<Screening[]>;

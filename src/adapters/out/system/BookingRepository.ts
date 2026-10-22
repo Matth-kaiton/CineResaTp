@@ -1,5 +1,5 @@
 import { readDb, writeDb } from "./dbService";
-import { Booking } from "../../../domain/Booking";
+import { Booking } from "../../../domain/types/Booking";
 import { BookingRepositoryPort } from "../../../application/ports/out/BookingRepositoryPort";
 
 class BookingRepository implements BookingRepositoryPort {

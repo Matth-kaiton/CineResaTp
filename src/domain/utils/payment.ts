@@ -1,4 +1,4 @@
-import { UserStatus } from "../domain/enum/UserStatuts";
+import { UserStatus } from "../enum/UserStatuts";
 
 export function pay(price: number): boolean {
   // paiement : appel au prestataire (simulé)

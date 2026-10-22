@@ -1,6 +1,6 @@
 import { readDb } from "./dbService";
-import { Screening } from "../../../domain/Screening";
-import { Booking } from "../../../domain/Booking";
+import { Screening } from "../../../domain/types/Screening";
+import { Booking } from "../../../domain/types/Booking";
 import { ScreeningRepositoryPort } from "../../../application/ports/out/ScreeningRepositoryPort";
 
 class ScreeningRepository implements ScreeningRepositoryPort {

@@ -1,4 +1,4 @@
-import { Booking } from "../../../domain/Booking";
+import { Booking } from "../../../domain/types/Booking";
 
 export interface BookingRepositoryPort {
   getAllByMail(email: string): Promise<Booking[]>;

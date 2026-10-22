@@ -1,4 +1,4 @@
-import { Booking } from "../../../domain/Booking";
+import { Booking } from "../../../domain/types/Booking";
 import { UserStatus } from "../../../domain/enum/UserStatuts";
 
 export default interface MakeBooking {
