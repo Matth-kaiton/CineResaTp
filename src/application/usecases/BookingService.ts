@@ -84,14 +84,8 @@ export class BookingService
     if (!booking) {
       throw new Error("Booking not found");
     }
-    if (booking.status === BookingStatus.CANCELLED) {
-      throw new Error("Booking is already cancelled");
-    }
-    if (!cancelBookingRule(booking)) {
-      throw new Error(
-        "Booking can only be cancelled within 2 hours of screening start time",
-      );
-    }
+
+    cancelBookingRule(booking);
 
     return await this.bookingRepo.update(booking);
   }
