@@ -3,6 +3,6 @@ export enum UserStatus {
   NORMAL = "normal",
 }
 
-export function isValidStatus(value: string): value is UserStatus {
+export function isValidUserStatus(value: string): value is UserStatus {
   return Object.values(UserStatus).includes(value as UserStatus);
 }

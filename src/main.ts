@@ -5,7 +5,7 @@ import { errorHandler } from "./adapters/in/http/errorHandler";
 import { ScreeningService } from "./application/usecases/ScreeningService";
 import { BookingService } from "./application/usecases/BookingService";
 import ScreeningRepository from "./adapters/out/system/ScreeningRepository";
-import BookingRepository from "./adapters/out/system/BookingRepository";
+import JsonBookingRepository from "./adapters/out/system/JsonBookingRepository";
 import Mailer from "./adapters/out/notification/mailer";
 import Payment from "./adapters/out/payment/payment";
 
@@ -16,7 +16,7 @@ const screeningService = new ScreeningService(ScreeningRepository);
 const bookingService = new BookingService(
   screeningService,
   ScreeningRepository,
-  BookingRepository,
+  JsonBookingRepository,
   Mailer,
   Payment,
 );

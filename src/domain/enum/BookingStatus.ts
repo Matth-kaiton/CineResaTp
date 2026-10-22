@@ -3,6 +3,6 @@ export enum BookingStatus {
   CANCELLED = "cancel",
 }
 
-export function isValidStatus(value: string): value is BookingStatus {
+export function isValidBookingStatus(value: string): value is BookingStatus {
   return Object.values(BookingStatus).includes(value as BookingStatus);
 }
