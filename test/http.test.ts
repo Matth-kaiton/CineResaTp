@@ -23,6 +23,7 @@ const app = buildApp({
   bookings: new InMemoryBookingRepository(),
   payment: new FakePaymentGateway(() => true),
   notifier: {
+    sendNotification: async () => {},
     bookingConfirmed: async () => {},
     bookingCancelled: async () => {},
   },

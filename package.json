@@ -6,6 +6,7 @@
   "scripts": {
     "seed": "tsx scripts/seed.ts",
     "start": "tsx src/main.ts",
+    "start:json": "tsx src/main.ts --json",
     "dev": "tsx watch src/main.ts",
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc"

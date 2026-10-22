@@ -1,88 +1,86 @@
-import { readDb, writeDb } from "../system/dbService";
 import { Booking } from "../../../domain/types/Booking";
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
-import {
-  UserStatus,
-  isValidUserStatus,
-} from "../../../domain/enum/UserStatuts";
-import {
-  BookingStatus,
-  isValidBookingStatus,
-} from "../../../domain/enum/BookingStatus";
-import ErrorResponse from "../../../domain/errorResponse";
-import { JsonFile } from "./JsonFile";
+import { UserStatus } from "../../../domain/enum/UserStatuts";
+import { BookingStatus } from "../../../domain/enum/BookingStatus";
+import { JsonFile, BookingRecord } from "./JsonFile";
 
 export default class JsonBookingRepository implements BookingRepository {
-  private readonly db = readDb();
-  constructor(file: JsonFile) {}
+  constructor(private readonly file: JsonFile) {}
 
-  async findByEmail(mail: string) {
-    const result = await this.db.bookings
-      .filter((b: Booking) => b.email === mail)
-      .map((b: any) => this.toDomain(b));
-    return result;
+  async findByEmail(email: string): Promise<Booking[]> {
+    const data = this.file.read();
+    return data.bookings
+      .filter((b) => b.email === email)
+      .map((b) => this.toDomain(b));
   }
 
-  async save(booking: Booking) {
-    await this.db.bookings.push(this.toRaw(booking));
-    writeDb(this.db);
+  async findById(id: string): Promise<Booking | null> {
+    const data = this.file.read();
+    const record = data.bookings.find((b) => b.id === id);
+    if (!record) return null;
+    return this.toDomain(record);
+  }
+
+  async save(booking: Booking): Promise<Booking> {
+    const data = this.file.read();
+    const record = this.toRecord(booking);
+    const index = data.bookings.findIndex((b) => b.id === booking.id);
+    if (index !== -1) {
+      data.bookings[index] = record;
+    } else {
+      data.bookings.push(record);
+    }
+    this.file.write(data);
     return booking;
   }
 
-  async update(booking: Booking) {
-    const index = await this.db.bookings.findIndex(
-      (b: Booking) => b.id === booking.id,
-    );
-
-    this.db.bookings[index] = this.toRaw(booking);
-    writeDb(this.db);
-    return booking;
-  }
-
-  async findById(id: string): Promise<Booking> {
-    const b = await this.db.bookings.find((x: any) => x.id === id);
-    if (!b) throw new ErrorResponse("Booking not found", 404);
-    return this.toDomain(b);
+  async update(booking: Booking): Promise<Booking> {
+    return this.save(booking);
   }
 
   async countConfirmedSeats(screeningId: string): Promise<number> {
-    const confirmedBookings = await this.db.bookings.filter(
-      (b: any) =>
-        b.screeningId === screeningId && b.status === BookingStatus.CONFIRMED,
-    );
-    const totalSeats = confirmedBookings.reduce(
-      (sum: number, b: any) => sum + b.seats,
-      0,
-    );
-    return totalSeats;
+    const data = this.file.read();
+    return data.bookings
+      .filter((b) => b.screeningId === screeningId && b.status === "CONFIRMED")
+      .reduce((sum, b) => sum + b.seats, 0);
   }
 
-  private toDomain(raw: any): Booking {
-    if (!isValidUserStatus(raw.tariff)) {
-      throw new ErrorResponse(`Invalid UserStatus: ${raw.tariff}`, 400);
-    }
-    if (!isValidBookingStatus(raw.status)) {
-      throw new ErrorResponse(`Invalid BookingStatus: ${raw.status}`, 400);
-    }
-    const booking: Booking = {
-      ...raw,
-      tariff: raw.tariff as UserStatus,
-      status: raw.status as BookingStatus,
-      createdAt: new Date(raw.createdAt),
-      cancelledAt: raw.cancelledAt ? new Date(raw.cancelledAt) : undefined,
+  private toDomain(record: BookingRecord): Booking {
+    const domainBooking: Booking = {
+      id: record.id,
+      screeningId: record.screeningId,
+      email: record.email,
+      seats: record.seats,
+      tariff:
+        record.tariff === "STUDENT" ? UserStatus.STUDENT : UserStatus.NORMAL,
+      total: record.total,
+      status:
+        record.status === "CANCELLED"
+          ? BookingStatus.CANCELLED
+          : BookingStatus.CONFIRMED,
+      createdAt: new Date(record.createdAt),
     };
-    return booking;
+    if (record.cancelledAt) {
+      domainBooking.cancelledAt = new Date(record.cancelledAt);
+    }
+    return domainBooking;
   }
 
-  private toRaw(booking: Booking): any {
-    return {
-      ...booking,
-      tariff: booking.tariff as string,
-      status: booking.status as string,
+  private toRecord(booking: Booking): BookingRecord {
+    const record: BookingRecord = {
+      id: booking.id,
+      screeningId: booking.screeningId,
+      email: booking.email,
+      seats: booking.seats,
+      tariff: booking.tariff === UserStatus.STUDENT ? "STUDENT" : "NORMAL",
+      total: booking.total,
+      status:
+        booking.status === BookingStatus.CANCELLED ? "CANCELLED" : "CONFIRMED",
       createdAt: booking.createdAt.toISOString(),
-      cancelledAt: booking.cancelledAt
-        ? booking.cancelledAt.toISOString()
-        : undefined,
     };
+    if (booking.cancelledAt) {
+      record.cancelledAt = booking.cancelledAt.toISOString();
+    }
+    return record;
   }
 }

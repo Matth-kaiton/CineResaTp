@@ -12,6 +12,7 @@ import { calculatePrice } from "../../domain/utils/price";
 import CancelBooking from "../ports/in/CancelBooking";
 import ListMyBookings from "../ports/in/ListMyBookings";
 import { cancelBookingRule } from "../../domain/utils/cancelBookingRule";
+import { Screening } from "../../domain/types/Screening";
 
 export class BookingService
   implements MakeBooking, CancelBooking, ListMyBookings
@@ -32,28 +33,12 @@ export class BookingService
     tarif: UserStatus = UserStatus.NORMAL,
   ): Promise<Booking> {
     const screening = await this.screeningService.getScreeningById(screeningId);
-
     if (!screening) {
       throw new ErrorResponse("Screening not found", 404);
     }
-    if (!seats || seats < 1 || seats > 6) {
-      throw new ErrorResponse("Seats must be between 1 and 6", 400);
-    }
-
-    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      throw new ErrorResponse("email not present or wrong format", 400);
-    }
-
     const now = this.clock.now();
-    if (new Date(screening.startsAt) <= now) {
-      throw new ErrorResponse("Screening has already started", 409);
-    }
 
-    const remainingSeats =
-      await this.screeningRepo.countRemainingSeats(screening);
-    if (remainingSeats < seats) {
-      throw new ErrorResponse("Not enough seats available", 409);
-    }
+    await this.validateScreening(screening, seats, email, now);
 
     const totalPrice = calculatePrice(screening.price, seats, tarif);
     const paid = await this.payment.pay(totalPrice);
@@ -76,6 +61,31 @@ export class BookingService
     await this.mailer.bookingConfirmed(booking);
 
     return booking;
+  }
+
+  private async validateScreening(
+    screening: Screening,
+    seats: number,
+    email: string,
+    now: Date,
+  ) {
+    if (!seats || seats < 1 || seats > 6) {
+      throw new ErrorResponse("Seats must be between 1 and 6", 400);
+    }
+
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      throw new ErrorResponse("email not present or wrong format", 400);
+    }
+
+    if (new Date(screening.startsAt) <= now) {
+      throw new ErrorResponse("Screening has already started", 409);
+    }
+
+    const remainingSeats =
+      await this.screeningRepo.countRemainingSeats(screening);
+    if (remainingSeats < seats) {
+      throw new ErrorResponse("Not enough seats available", 409);
+    }
   }
 
   async cancelBooking(bookingId: string): Promise<Booking> {
