@@ -81,7 +81,7 @@ describe("BookSeatsService", () => {
       expect(err.statusCode).toBe(409);
     }
   });
-  it.todo("refuse une séance déjà commencée (code CONFLICT)", async () => {
+  it("refuse une séance déjà commencée (code CONFLICT)", async () => {
     fakeScreeningService.getScreeningById = async () => ({
       id: "s1",
       movie: "Inception",
