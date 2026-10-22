@@ -4,7 +4,7 @@ import { UserStatus } from "../../domain/enum/UserStatuts";
 import { BookingStatus } from "../../domain/enum/BookingStatus";
 import MakeBooking from "../ports/in/MakeBooking";
 import { BookingRepository } from "../ports/out/BookingRepository";
-import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
+import { ScreeningRepository } from "../ports/out/ScreeningRepository";
 import { ScreeningService } from "./ScreeningService";
 import { NotifyPort } from "../ports/out/NotifyPort";
 import { PaymentPort } from "../ports/out/PaymentPort";
@@ -18,7 +18,7 @@ export class BookingService
 {
   constructor(
     private screeningService: ScreeningService,
-    private screeningRepo: ScreeningRepositoryPort,
+    private screeningRepo: ScreeningRepository,
     private bookingRepo: BookingRepository,
     private mailer: NotifyPort,
     private payment: PaymentPort,

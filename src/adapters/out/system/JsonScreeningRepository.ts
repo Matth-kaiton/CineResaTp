@@ -1,9 +1,9 @@
 import { readDb } from "./dbService";
 import { Screening } from "../../../domain/types/Screening";
 import { Booking } from "../../../domain/types/Booking";
-import { ScreeningRepositoryPort } from "../../../application/ports/out/ScreeningRepositoryPort";
+import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
 
-class ScreeningRepository implements ScreeningRepositoryPort {
+class JsonScreeningRepository implements ScreeningRepository {
   private db = readDb();
 
   async listUpcomingScreenings() {
@@ -35,4 +35,4 @@ class ScreeningRepository implements ScreeningRepositoryPort {
   }
 }
 
-export default new ScreeningRepository();
+export default new JsonScreeningRepository();

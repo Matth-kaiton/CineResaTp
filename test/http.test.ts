@@ -1,22 +1,25 @@
 import request from "supertest";
 import { describe, expect, it } from "vitest";
 import InMemoryBookingRepository from "../src/adapters/out/persistence/InMemoryBookingRepository";
-import { InMemoryScreeningRepository } from "../src/adapters/out/persistence/InMemoryScreeningRepository";
-import { FakePaymentGateway } from "../src/adapters/out/payment/FakePaymentGateway";
+import InMemoryScreeningRepository from "../src/adapters/out/persistence/InMemoryScreeningRepository";
+import FakePaymentGateway from "../src/adapters/out/payment/FakePaymentGateway";
 import { buildApp } from "../src/container";
 
 // Test de l'adapter HTTP : on branche l'app complète sur des adapters de test
 const app = buildApp({
-  screenings: new InMemoryScreeningRepository([
-    {
-      id: "s1",
-      movie: "Dune",
-      room: "1",
-      startsAt: new Date("2030-01-01T20:00:00Z"),
-      capacity: 10,
-      unitPrice: 1000,
-    },
-  ]),
+  screenings: new InMemoryScreeningRepository(
+    [
+      {
+        id: "s1",
+        movie: "Dune",
+        room: "1",
+        startsAt: new Date("2030-01-01T20:00:00Z"),
+        capacity: 10,
+        price: 1000,
+      },
+    ],
+    new InMemoryBookingRepository(),
+  ),
   bookings: new InMemoryBookingRepository(),
   payment: new FakePaymentGateway(() => true),
   notifier: {

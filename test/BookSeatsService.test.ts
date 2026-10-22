@@ -3,7 +3,7 @@ import { BookingService } from "../src/application/usecases/BookingService";
 import { UserStatus } from "../src/domain/enum/UserStatuts";
 import { BookingStatus } from "../src/domain/enum/BookingStatus";
 import { ScreeningService } from "../src/application/usecases/ScreeningService";
-import { ScreeningRepositoryPort } from "../src/application/ports/out/ScreeningRepositoryPort";
+import { ScreeningRepository } from "../src/application/ports/out/ScreeningRepository";
 import { BookingRepository } from "../src/application/ports/out/BookingRepository";
 import { NotifyPort } from "../src/application/ports/out/NotifyPort";
 import { PaymentPort } from "../src/application/ports/out/PaymentPort";
@@ -16,7 +16,7 @@ describe("BookSeatsService", () => {
   let bookingService: BookingService;
 
   let fakeScreeningService: ScreeningService;
-  let fakeScreeningRepo: ScreeningRepositoryPort;
+  let fakeScreeningRepo: ScreeningRepository;
   let fakeBookingRepo: BookingRepository;
   let fakeMailer: NotifyPort;
   let fakePayment: PaymentPort;
@@ -35,7 +35,7 @@ describe("BookSeatsService", () => {
 
     fakeScreeningRepo = {
       countRemainingSeats: async () => 20,
-    } as unknown as ScreeningRepositoryPort;
+    } as unknown as ScreeningRepository;
 
     fakeBookingRepo = {
       create: async (booking: any) => booking,
