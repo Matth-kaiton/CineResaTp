@@ -3,7 +3,7 @@ import ErrorResponse from "../../domain/errorResponse";
 import { UserStatus } from "../../domain/enum/UserStatuts";
 import { BookingStatus } from "../../domain/enum/BookingStatus";
 import MakeBooking from "../ports/in/MakeBooking";
-import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
+import { BookingRepository } from "../ports/out/BookingRepository";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
 import { NotifyPort } from "../ports/out/NotifyPort";
@@ -19,7 +19,7 @@ export class BookingService
   constructor(
     private screeningService: ScreeningService,
     private screeningRepo: ScreeningRepositoryPort,
-    private bookingRepo: BookingRepositoryPort,
+    private bookingRepo: BookingRepository,
     private mailer: NotifyPort,
     private payment: PaymentPort,
   ) {}
@@ -60,7 +60,7 @@ export class BookingService
       throw new ErrorResponse("Payment failed", 402);
     }
 
-    const booking: Booking = await this.bookingRepo.create({
+    const booking: Booking = await this.bookingRepo.save({
       id: "b" + Date.now(),
       screeningId: screening.id,
       email: email,
@@ -80,7 +80,7 @@ export class BookingService
   }
 
   async cancelBooking(bookingId: string): Promise<Booking> {
-    const booking = await this.bookingRepo.getById(bookingId);
+    const booking = await this.bookingRepo.findById(bookingId);
     if (!booking) {
       throw new ErrorResponse("Booking not found", 404);
     }
@@ -100,6 +100,6 @@ export class BookingService
       throw new ErrorResponse("email not send", 400);
     }
 
-    return await this.bookingRepo.getAllByMail(email);
+    return await this.bookingRepo.findByEmail(email);
   }
 }

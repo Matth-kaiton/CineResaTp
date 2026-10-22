@@ -5,7 +5,7 @@ import { errorHandler } from "./adapters/in/http/errorHandler";
 import { ScreeningService } from "./application/usecases/ScreeningService";
 import { BookingService } from "./application/usecases/BookingService";
 import ScreeningRepository from "./adapters/out/system/ScreeningRepository";
-import JsonBookingRepository from "./adapters/out/system/JsonBookingRepository";
+import JsonBookingRepository from "./adapters/out/persistence/JsonBookingRepository";
 import Mailer from "./adapters/out/notification/mailer";
 import Payment from "./adapters/out/payment/payment";
 

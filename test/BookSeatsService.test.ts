@@ -4,7 +4,7 @@ import { UserStatus } from "../src/domain/enum/UserStatuts";
 import { BookingStatus } from "../src/domain/enum/BookingStatus";
 import { ScreeningService } from "../src/application/usecases/ScreeningService";
 import { ScreeningRepositoryPort } from "../src/application/ports/out/ScreeningRepositoryPort";
-import { BookingRepositoryPort } from "../src/application/ports/out/BookingRepositoryPort";
+import { BookingRepository } from "../src/application/ports/out/BookingRepository";
 import { NotifyPort } from "../src/application/ports/out/NotifyPort";
 import { PaymentPort } from "../src/application/ports/out/PaymentPort";
 import ErrorResponse from "../src/domain/errorResponse";
@@ -17,7 +17,7 @@ describe("BookSeatsService", () => {
 
   let fakeScreeningService: ScreeningService;
   let fakeScreeningRepo: ScreeningRepositoryPort;
-  let fakeBookingRepo: BookingRepositoryPort;
+  let fakeBookingRepo: BookingRepository;
   let fakeMailer: NotifyPort;
   let fakePayment: PaymentPort;
 
@@ -39,7 +39,7 @@ describe("BookSeatsService", () => {
 
     fakeBookingRepo = {
       create: async (booking: any) => booking,
-    } as unknown as BookingRepositoryPort;
+    } as unknown as BookingRepository;
 
     fakeMailer = {
       sendNotification: vi.fn().mockResolvedValue(undefined),
@@ -165,7 +165,7 @@ describe("BookSeatsService", () => {
       status: BookingStatus.CANCELLED,
     };
 
-    fakeBookingRepo.getById = async () => existingBooking as any;
+    fakeBookingRepo.findById = async () => existingBooking as any;
 
     try {
       await bookingService.cancelBooking("b1");
@@ -184,7 +184,7 @@ describe("BookSeatsService", () => {
       status: BookingStatus.CONFIRMED,
     };
 
-    fakeBookingRepo.getById = async () => existingBooking as any;
+    fakeBookingRepo.findById = async () => existingBooking as any;
 
     try {
       await bookingService.cancelBooking("b1");

@@ -1,6 +1,6 @@
-import { readDb, writeDb } from "./dbService";
+import { readDb, writeDb } from "../system/dbService";
 import { Booking } from "../../../domain/types/Booking";
-import { BookingRepositoryPort } from "../../../application/ports/out/BookingRepositoryPort";
+import { BookingRepository } from "../../../application/ports/out/BookingRepository";
 import {
   UserStatus,
   isValidUserStatus,
@@ -10,18 +10,20 @@ import {
   isValidBookingStatus,
 } from "../../../domain/enum/BookingStatus";
 import ErrorResponse from "../../../domain/errorResponse";
+import { JsonFile } from "./JsonFile";
 
-class JsonBookingRepository implements BookingRepositoryPort {
+export default class JsonBookingRepository implements BookingRepository {
   private readonly db = readDb();
+  constructor(file: JsonFile) {}
 
-  async getAllByMail(mail: string) {
+  async findByEmail(mail: string) {
     const result = await this.db.bookings
       .filter((b: Booking) => b.email === mail)
       .map((b: any) => this.toDomain(b));
     return result;
   }
 
-  async create(booking: Booking) {
+  async save(booking: Booking) {
     await this.db.bookings.push(this.toRaw(booking));
     writeDb(this.db);
     return booking;
@@ -37,10 +39,22 @@ class JsonBookingRepository implements BookingRepositoryPort {
     return booking;
   }
 
-  async getById(id: string): Promise<Booking> {
+  async findById(id: string): Promise<Booking> {
     const b = await this.db.bookings.find((x: any) => x.id === id);
     if (!b) throw new ErrorResponse("Booking not found", 404);
     return this.toDomain(b);
+  }
+
+  async countConfirmedSeats(screeningId: string): Promise<number> {
+    const confirmedBookings = await this.db.bookings.filter(
+      (b: any) =>
+        b.screeningId === screeningId && b.status === BookingStatus.CONFIRMED,
+    );
+    const totalSeats = confirmedBookings.reduce(
+      (sum: number, b: any) => sum + b.seats,
+      0,
+    );
+    return totalSeats;
   }
 
   private toDomain(raw: any): Booking {
@@ -72,5 +86,3 @@ class JsonBookingRepository implements BookingRepositoryPort {
     };
   }
 }
-
-export default new JsonBookingRepository();

@@ -65,6 +65,148 @@
       "total": 5175,
       "status": "confirm",
       "createdAt": "2026-10-20T14:33:08.677Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "cancel",
+      "createdAt": "2026-10-20T10:00:00.000Z",
+      "cancelledAt": "2026-10-20T11:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b2",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 3,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b3",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 4,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "cancel",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b4",
+      "screeningId": "s2",
+      "email": "a@b.fr",
+      "seats": 5,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "cancel",
+      "createdAt": "2026-10-20T10:00:00.000Z",
+      "cancelledAt": "2026-10-20T11:00:00.000Z"
+    },
+    {
+      "id": "b1",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 2,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b2",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 3,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b3",
+      "screeningId": "s1",
+      "email": "a@b.fr",
+      "seats": 4,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "cancel",
+      "createdAt": "2026-10-20T10:00:00.000Z"
+    },
+    {
+      "id": "b4",
+      "screeningId": "s2",
+      "email": "a@b.fr",
+      "seats": 5,
+      "tariff": "normal",
+      "total": 2000,
+      "status": "confirm",
+      "createdAt": "2026-10-20T10:00:00.000Z"
     }
   ]
 }
