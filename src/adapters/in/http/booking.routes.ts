@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { apiResponse } from "./apiResponse";
 import { BookingService } from "../../../application/usecases/BookingService";
-import { ScreeningService } from "../../../application/usecases/ScreeningService";
 
 export const bookingRouter = (bookingService: BookingService) => {
   const router = Router();

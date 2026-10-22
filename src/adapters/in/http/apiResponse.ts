@@ -1,5 +1,3 @@
-import { error } from "node:console";
-
 export const apiResponse = {
   // Pour un succès avec des données (GET, PUT, DELETE)
   success(res: any, data: any, statusCode: number = 200) {

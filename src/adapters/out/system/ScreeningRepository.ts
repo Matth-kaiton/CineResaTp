@@ -4,7 +4,6 @@ import { Booking } from "../../../domain/types/Booking";
 import { ScreeningRepositoryPort } from "../../../application/ports/out/ScreeningRepositoryPort";
 
 class ScreeningRepository implements ScreeningRepositoryPort {
-  constructor() {}
   private db = readDb();
 
   async listUpcomingScreenings() {
