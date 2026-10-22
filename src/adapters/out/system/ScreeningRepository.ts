@@ -7,7 +7,7 @@ class ScreeningRepository implements ScreeningRepositoryPort {
   constructor() {}
   private db = readDb();
 
-  async getScreenings() {
+  async listUpcomingScreenings() {
     const now = new Date();
     const result = [];
 

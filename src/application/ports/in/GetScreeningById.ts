@@ -1,6 +1,5 @@
 import { Screening } from "../../../domain/Screening";
 
-export interface IScreening {
-  getScreenings(): Promise<Screening[]>;
+export interface GetScreeningById {
   getScreeningById(id: string): Promise<Screening | null>;
 }

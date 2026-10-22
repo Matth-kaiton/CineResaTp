@@ -2,15 +2,19 @@ import { Booking } from "../../domain/Booking";
 import ErrorResponse from "../../domain/errorResponse";
 import { UserStatus } from "../../domain/enum/UserStatuts";
 import { BookingStatus } from "../../domain/enum/BookingStatus";
-import IBooking from "../ports/in/IBooking";
+import MakeBooking from "../ports/in/MakeBooking";
 import { BookingRepositoryPort } from "../ports/out/BookingRepositoryPort";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 import { ScreeningService } from "./ScreeningService";
 import { NotifyPort } from "../ports/out/NotifyPort";
 import { PaymentPort } from "../ports/out/PaymentPort";
 import { calculatePrice } from "../../domain/utils/price";
+import CancelBooking from "../ports/in/CancelBooking";
+import ListMyBookings from "../ports/in/ListMyBookings";
 
-export class BookingService implements IBooking {
+export class BookingService
+  implements MakeBooking, CancelBooking, ListMyBookings
+{
   constructor(
     private screeningService: ScreeningService,
     private screeningRepo: ScreeningRepositoryPort,
@@ -91,7 +95,7 @@ export class BookingService implements IBooking {
     return await this.bookingRepo.update(booking);
   }
 
-  async myBookings(email: string | null): Promise<Booking[]> {
+  async listMyBookings(email: string | null): Promise<Booking[]> {
     if (!email) {
       throw new ErrorResponse("email not send", 400);
     }

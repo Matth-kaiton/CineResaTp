@@ -1,13 +1,16 @@
 import ErrorResponse from "../../domain/errorResponse";
 import { Screening } from "../../domain/Screening";
-import { IScreening } from "../ports/in/IScreening";
+import { GetScreeningById } from "../ports/in/GetScreeningById";
+import ListUpcomingScreenings from "../ports/in/ListUpcomingScreenings";
 import { ScreeningRepositoryPort } from "../ports/out/ScreeningRepositoryPort";
 
-export class ScreeningService implements IScreening {
+export class ScreeningService
+  implements GetScreeningById, ListUpcomingScreenings
+{
   constructor(private screeningRepo: ScreeningRepositoryPort) {}
 
-  async getScreenings(): Promise<Screening[]> {
-    return this.screeningRepo.getScreenings();
+  async listUpcomingScreenings(): Promise<Screening[]> {
+    return this.screeningRepo.listUpcomingScreenings();
   }
 
   async getScreeningById(id: string): Promise<Screening | null> {
