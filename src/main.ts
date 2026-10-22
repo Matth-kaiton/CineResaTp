@@ -1,37 +1,22 @@
-import express from "express";
-import { screeningRouter } from "./adapters/in/http/screening.routes";
-import { bookingRouter } from "./adapters/in/http/booking.routes";
-import { errorHandler } from "./adapters/in/http/errorHandler";
-import { ScreeningService } from "./application/usecases/ScreeningService";
-import { BookingService } from "./application/usecases/BookingService";
-import JsonScreeningRepository from "./adapters/out/system/JsonScreeningRepository";
-import JsonBookingRepository from "./adapters/out/persistence/JsonBookingRepository";
+import { buildApp } from "./container";
+import InMemoryScreeningRepository from "./adapters/out/persistence/InMemoryScreeningRepository";
+import InMemoryBookingRepository from "./adapters/out/persistence/InMemoryBookingRepository";
 import Mailer from "./adapters/out/notification/mailer";
 import Payment from "./adapters/out/payment/payment";
 
-const app = express();
-app.use(express.json());
+const bookingRepo = new InMemoryBookingRepository();
+const screeningRepo = new InMemoryScreeningRepository([], bookingRepo);
 
-const screeningService = new ScreeningService(JsonScreeningRepository);
-const bookingService = new BookingService(
-  screeningService,
-  JsonScreeningRepository,
-  JsonBookingRepository,
-  Mailer,
-  Payment,
-);
-
-app.use("/screenings", screeningRouter(screeningService, bookingService));
-
-app.use("/bookings", bookingRouter(bookingService));
+const app = buildApp({
+  screenings: screeningRepo,
+  bookings: bookingRepo,
+  payment: Payment,
+  notifier: Mailer,
+});
 
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
-  app.listen(PORT, () =>
-    console.log(`CinéResa legacy sur http://localhost:${PORT}`),
-  );
+  app.listen(PORT, () => console.log(`CinéResa sur http://localhost:${PORT}`));
 }
-
-app.use(errorHandler);
 
 export default app;

@@ -9,9 +9,8 @@ export function errorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  //gestion erreur perso
   if (err instanceof ErrorResponse) {
-    return apiResponse.error(res, err.message, err.statusCode);
+    return apiResponse.error(res, { error: err.message }, err.statusCode);
   }
 
   // gestion erreur normal

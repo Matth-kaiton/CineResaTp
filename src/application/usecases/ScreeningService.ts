@@ -6,7 +6,7 @@ import { ScreeningRepository } from "../ports/out/ScreeningRepository";
 export class ScreeningService
   implements GetScreeningById, ListUpcomingScreenings
 {
-  constructor(private screeningRepo: ScreeningRepository) {}
+  constructor(private readonly screeningRepo: ScreeningRepository) {}
 
   async listUpcomingScreenings(): Promise<Screening[]> {
     return this.screeningRepo.listUpcomingScreenings();

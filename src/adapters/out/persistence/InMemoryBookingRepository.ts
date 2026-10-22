@@ -1,6 +1,5 @@
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
 import { BookingStatus } from "../../../domain/enum/BookingStatus";
-import ErrorResponse from "../../../domain/errorResponse";
 import { Booking } from "../../../domain/types/Booking";
 
 export default class InMemoryBookingRepository implements BookingRepository {
@@ -10,25 +9,23 @@ export default class InMemoryBookingRepository implements BookingRepository {
     return this.bookings.filter((b) => b.email === email);
   }
 
-  async findById(id: string): Promise<Booking> {
+  async findById(id: string): Promise<Booking | null> {
     const booking = this.bookings.find((b) => b.id === id);
-    if (!booking) {
-      throw new ErrorResponse("Booking not found", 404);
-    }
-    return booking;
+    return booking || null;
   }
 
   async save(booking: Booking): Promise<Booking> {
-    this.bookings.push(booking);
+    const index = this.bookings.findIndex((b) => b.id === booking.id);
+    if (index !== -1) {
+      this.bookings[index] = booking;
+    } else {
+      this.bookings.push(booking);
+    }
     return booking;
   }
 
   async update(booking: Booking): Promise<Booking> {
-    const index = this.bookings.findIndex((b) => b.id === booking.id);
-    if (index !== -1) {
-      this.bookings[index] = booking;
-    }
-    return booking;
+    return this.save(booking);
   }
 
   async countConfirmedSeats(screeningId: string): Promise<number> {

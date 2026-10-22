@@ -17,11 +17,12 @@ export class BookingService
   implements MakeBooking, CancelBooking, ListMyBookings
 {
   constructor(
-    private screeningService: ScreeningService,
-    private screeningRepo: ScreeningRepository,
-    private bookingRepo: BookingRepository,
-    private mailer: NotifyPort,
-    private payment: PaymentPort,
+    private readonly screeningService: ScreeningService,
+    private readonly screeningRepo: ScreeningRepository,
+    private readonly bookingRepo: BookingRepository,
+    private readonly mailer: NotifyPort,
+    private readonly payment: PaymentPort,
+    private readonly clock: { now: () => Date } = { now: () => new Date() },
   ) {}
 
   async makeBooking(
@@ -43,7 +44,8 @@ export class BookingService
       throw new ErrorResponse("email not present or wrong format", 400);
     }
 
-    if (new Date(screening.startsAt) <= new Date()) {
+    const now = this.clock.now();
+    if (new Date(screening.startsAt) <= now) {
       throw new ErrorResponse("Screening has already started", 409);
     }
 
@@ -68,13 +70,10 @@ export class BookingService
       tariff: tarif,
       total: totalPrice,
       status: BookingStatus.CONFIRMED,
-      createdAt: new Date(),
+      createdAt: now,
     });
 
-    await this.mailer.sendNotification(
-      email,
-      `Your booking for ${screening.movie} is confirmed. Total price: ${totalPrice}`,
-    );
+    await this.mailer.bookingConfirmed(booking);
 
     return booking;
   }
@@ -90,9 +89,18 @@ export class BookingService
     if (!screening) {
       throw new ErrorResponse("Screening not found", 404);
     }
-    cancelBookingRule(booking, screening.startsAt);
 
-    return await this.bookingRepo.update(booking);
+    const now = this.clock.now();
+    cancelBookingRule(booking, screening.startsAt, now);
+
+    booking.status = BookingStatus.CANCELLED;
+    booking.cancelledAt = now;
+
+    const saved = await this.bookingRepo.save(booking);
+
+    await this.mailer.bookingCancelled(saved);
+
+    return saved;
   }
 
   async listMyBookings(email: string | null): Promise<Booking[]> {
