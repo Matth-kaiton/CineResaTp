@@ -11,6 +11,7 @@ import { PaymentPort } from "../ports/out/PaymentPort";
 import { calculatePrice } from "../../domain/utils/price";
 import CancelBooking from "../ports/in/CancelBooking";
 import ListMyBookings from "../ports/in/ListMyBookings";
+import { cancelBookingRule } from "../../domain/utils/cancelBookingRule";
 
 export class BookingService
   implements MakeBooking, CancelBooking, ListMyBookings
@@ -86,7 +87,11 @@ export class BookingService
     if (booking.status === BookingStatus.CANCELLED) {
       throw new Error("Booking is already cancelled");
     }
-    
+    if (!cancelBookingRule(booking)) {
+      throw new Error(
+        "Booking can only be cancelled within 2 hours of screening start time",
+      );
+    }
 
     return await this.bookingRepo.update(booking);
   }
