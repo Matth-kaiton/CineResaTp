@@ -82,10 +82,15 @@ export class BookingService
   async cancelBooking(bookingId: string): Promise<Booking> {
     const booking = await this.bookingRepo.getById(bookingId);
     if (!booking) {
-      throw new Error("Booking not found");
+      throw new ErrorResponse("Booking not found", 404);
     }
-
-    cancelBookingRule(booking);
+    const screening = await this.screeningService.getScreeningById(
+      booking.screeningId,
+    );
+    if (!screening) {
+      throw new ErrorResponse("Screening not found", 404);
+    }
+    cancelBookingRule(booking, screening.startsAt);
 
     return await this.bookingRepo.update(booking);
   }
