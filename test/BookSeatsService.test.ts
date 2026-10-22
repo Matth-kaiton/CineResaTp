@@ -130,7 +130,7 @@ describe("BookSeatsService", () => {
 
     try {
       await bookingService.makeBooking(
-        "s99", // 👈 On demande "s99" qui n'existe pas
+        "s99",
         "matthias@ynov.com",
         2,
         UserStatus.NORMAL,
@@ -154,5 +154,24 @@ describe("BookSeatsService", () => {
 
     expect(createSpy).not.toHaveBeenCalled();
     expect(fakeMailer.sendNotification).not.toHaveBeenCalled();
+  });
+  it("refuse d'annuler une réservation déjà annulée (code CONFLICT)", async () => {
+    const existingBooking = {
+      id: "b1",
+      screeningId: "s1",
+      email: "matthias@ynov.com",
+      seats: 2,
+      total: 2000,
+      status: BookingStatus.CANCELLED,
+    };
+
+    fakeBookingRepo.getById = async () => existingBooking as any;
+
+    try {
+      await bookingService.cancelBooking("b1");
+      expect.fail("Devrait lever une erreur");
+    } catch (err: any) {
+      expect(err.statusCode).toBe(409);
+    }
   });
 });
