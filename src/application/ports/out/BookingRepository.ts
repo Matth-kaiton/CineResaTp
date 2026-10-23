@@ -1,4 +1,4 @@
-import { Booking } from "../../../domain/types/Booking";
+import Booking from "../../../domain/booking/Booking";
 
 export interface BookingRepository {
   findByEmail(email: string): Promise<Booking[]>;

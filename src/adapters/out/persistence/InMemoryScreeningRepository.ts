@@ -1,9 +1,12 @@
 import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
-import { Screening } from "../../../domain/types/Screening";
+import { Screening } from "../../../domain/booking/Screening";
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
 
 export default class InMemoryScreeningRepository implements ScreeningRepository {
-  constructor(private screenings: Screening[], private bookingRepository: BookingRepository) {}
+  constructor(
+    private screenings: Screening[],
+    private bookingRepository: BookingRepository,
+  ) {}
 
   async listUpcomingScreenings(): Promise<Screening[]> {
     return this.screenings;
@@ -16,7 +19,9 @@ export default class InMemoryScreeningRepository implements ScreeningRepository 
 
   async countRemainingSeats(screening: Screening): Promise<number> {
     const totalSeats = screening.capacity || 0;
-    const bookedSeats = await this.bookingRepository.countConfirmedSeats(screening.id);
+    const bookedSeats = await this.bookingRepository.countConfirmedSeats(
+      screening.id,
+    );
     return totalSeats - bookedSeats;
   }
 }

@@ -1,5 +1,5 @@
 import { NotifyPort } from "../../../application/ports/out/NotifyPort";
-import { Booking } from "../../../domain/types/Booking";
+import { Booking } from "../../../domain/booking/Booking";
 
 class Mailer implements NotifyPort {
   async sendNotification(to: string, message: string) {

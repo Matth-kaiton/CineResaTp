@@ -1,4 +1,4 @@
-import { Screening } from "../../domain/types/Screening";
+import { Screening } from "../../domain/booking/Screening";
 import { GetScreeningById } from "../ports/in/GetScreeningById";
 import ListUpcomingScreenings from "../ports/in/ListUpcomingScreenings";
 import { ScreeningRepository } from "../ports/out/ScreeningRepository";

@@ -1,4 +1,4 @@
-import { Screening } from "../../../domain/types/Screening";
+import { Screening } from "../../../domain/booking/Screening";
 import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
 import { JsonFile, ScreeningRecord } from "./JsonFile";
 

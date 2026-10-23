@@ -1,4 +1,4 @@
-import { Booking } from "../../../domain/types/Booking";
+import { Booking } from "../../../domain/booking/Booking";
 
 export interface NotifyPort {
   sendNotification(to: string, message: string): Promise<void>;

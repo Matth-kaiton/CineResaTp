@@ -1,6 +1,6 @@
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
 import { BookingStatus } from "../../../domain/enum/BookingStatus";
-import { Booking } from "../../../domain/types/Booking";
+import { Booking } from "../../../domain/booking/Booking";
 
 export default class InMemoryBookingRepository implements BookingRepository {
   private bookings: Booking[] = [];
