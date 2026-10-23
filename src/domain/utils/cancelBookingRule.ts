@@ -1,13 +1,13 @@
 import { BookingStatus } from "../enum/BookingStatus";
 import ErrorResponse from "../errorResponse";
-import { Booking } from "../types/Booking";
+import Booking from "../booking/Booking";
 
 export function cancelBookingRule(
   booking: Booking,
   screeningStartTime: Date,
   now: Date = new Date(),
 ) {
-  if (booking.status === BookingStatus.CANCELLED) {
+  if (booking.getStatus() === BookingStatus.CANCELLED) {
     throw new ErrorResponse("Booking is already cancelled", 409);
   }
   if (

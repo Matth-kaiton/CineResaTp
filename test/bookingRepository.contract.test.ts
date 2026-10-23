@@ -6,23 +6,37 @@ import InMemoryBookingRepository from "../src/adapters/out/persistence/InMemoryB
 import JsonBookingRepository from "../src/adapters/out/persistence/JsonBookingRepository";
 import { JsonFile } from "../src/adapters/out/persistence/JsonFile";
 import { BookingRepository } from "../src/application/ports/out/BookingRepository";
-import { Booking } from "../src/domain/booking/Booking";
+import Booking from "../src/domain/booking/Booking";
 import { UserStatus } from "../src/domain/enum/UserStatuts";
 import { BookingStatus } from "../src/domain/enum/BookingStatus";
+import Email from "../src/domain/shared/Email";
+import Money from "../src/domain/shared/Money";
+import SeatCounts from "../src/domain/booking/SeatCount";
 
 // Test de contrat : LA MÊME suite s'exécute sur chaque adapter du port.
 // Si un nouvel adapter (SQLite, Postgres…) passe cette suite, il est substituable (Liskov).
-const booking = (over: Partial<Booking> = {}): Booking => ({
-  id: "b1",
-  screeningId: "s1",
-  email: "a@b.fr",
-  seats: 2,
-  tariff: UserStatus.NORMAL,
-  total: 2000,
-  status: BookingStatus.CONFIRMED,
-  createdAt: new Date("2026-10-20T10:00:00Z"),
-  ...over,
-});
+const booking = (
+  over: {
+    id?: string;
+    screeningId?: string;
+    seats?: number;
+    status?: BookingStatus;
+    cancelledAt?: Date;
+  } = {},
+): Booking => {
+  const result = new Booking(
+    over.id ?? "b1",
+    over.screeningId ?? "s1",
+    new Email("a@b.fr"),
+    new SeatCounts(over.seats ?? 2),
+    UserStatus.NORMAL,
+    new Money(2000),
+    over.status ?? BookingStatus.CONFIRMED,
+    new Date("2026-10-20T10:00:00Z"),
+    over.cancelledAt ?? null,
+  );
+  return result;
+};
 
 function contract(name: string, factory: () => BookingRepository) {
   describe(`BookingRepository — ${name}`, () => {

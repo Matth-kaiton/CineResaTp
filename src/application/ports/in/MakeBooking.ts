@@ -6,8 +6,8 @@ import Email from "../../../domain/shared/Email";
 export default interface MakeBooking {
   makeBooking(
     id: string,
-    email: Email,
-    seats: SeatCounts,
-    tarif: UserStatus,
+    email: Email | string,
+    seats: SeatCounts | number,
+    tarif?: UserStatus | "NORMAL" | "STUDENT",
   ): Promise<Booking>;
 }

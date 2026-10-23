@@ -5,8 +5,22 @@ import Email from "../shared/Email";
 import Money from "../shared/Money";
 import SeatCounts from "./SeatCount";
 
+export type BookingSnapshot = {
+  id: string;
+  screeningId: string;
+  email: string;
+  seats: number;
+  tariff: UserStatus;
+  totalCents: number;
+  status: BookingStatus;
+  createdAt: string;
+  cancelledAt: string | null;
+};
+
 export default class Booking {
   readonly CANCEL_TIME_LIMIT: number = 120 * 60 * 1000;
+  private currentStatus: BookingStatus;
+  private cancellationDate: Date | null;
 
   constructor(
     readonly id: string,
@@ -15,16 +29,19 @@ export default class Booking {
     readonly seats: SeatCounts,
     readonly tariff: UserStatus,
     readonly total: Money,
-    private status: BookingStatus,
+    status: BookingStatus,
     readonly createdAt: Date,
-    private cancelledAt: Date | null = null,
-  ) {}
+    cancelledAt: Date | null = null,
+  ) {
+    this.currentStatus = status;
+    this.cancellationDate = cancelledAt;
+  }
 
   cancel(now: Date, screeningStartAt: Date): Booking {
     this.cancelBookingRule(this, screeningStartAt, now);
 
-    this.status = BookingStatus.CANCELLED;
-    this.cancelledAt = now;
+    this.currentStatus = BookingStatus.CANCELLED;
+    this.cancellationDate = now;
 
     return this;
   }
@@ -38,21 +55,45 @@ export default class Booking {
       this.CANCEL_TIME_LIMIT
     ) {
       throw new ErrorResponse(
-        "Booking can only be cancelled at least 2 hours before screening start time",
+        "La réservation ne peut pas être annulée moins de 2h avant la séance",
         409,
       );
     }
   }
 
   getCancelledAt() {
-    return this.cancelledAt;
+    return this.cancellationDate;
   }
 
   setCancelledAt(date: Date) {
-    this.cancelledAt = date;
+    this.cancellationDate = date;
   }
 
   getStatus() {
-    return this.status;
+    return this.currentStatus;
+  }
+
+  get status(): BookingStatus {
+    return this.currentStatus;
+  }
+
+  get cancelledAt(): Date | null {
+    return this.cancellationDate;
+  }
+
+  toSnapshot(): BookingSnapshot {
+    return {
+      id: this.id,
+      screeningId: this.screeningId,
+      email: this.email.value,
+      seats: this.seats.value,
+      tariff: this.tariff,
+      totalCents: this.total.cents,
+      status: this.currentStatus,
+      createdAt: this.createdAt.toISOString(),
+      cancelledAt: this.cancellationDate?.toISOString() ?? null,
+    };
   }
 }
+
+export { Booking };

@@ -6,7 +6,7 @@ export default class SeatCounts {
     if (!Number.isInteger(value) || value < 1 || value > SeatCounts.MAX) {
       throw new ErrorResponse(
         "Le nombres de siège dois entre entre 1 et 6",
-        406,
+        400,
       );
     }
   }

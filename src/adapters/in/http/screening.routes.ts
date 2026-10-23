@@ -1,14 +1,12 @@
 import { Router } from "express";
 import { ScreeningService } from "../../../application/usecases/ScreeningService";
 import { BookingService } from "../../../application/usecases/BookingService";
-import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
 import { apiResponse } from "./apiResponse";
 import { asyncHandler } from "./asyncHandler";
 
 export const screeningRouter = (
   screeningService: ScreeningService,
   bookingService: BookingService,
-  screeningRepo?: ScreeningRepository,
 ) => {
   const router = Router();
 
@@ -16,16 +14,18 @@ export const screeningRouter = (
     "/",
     asyncHandler(async (_req, res) => {
       const screenings = await screeningService.listUpcomingScreenings();
-      if (screeningRepo) {
-        const withRemaining = await Promise.all(
-          screenings.map(async (s) => ({
-            ...s,
-            remaining: await screeningRepo.countRemainingSeats(s),
-          })),
-        );
-        return apiResponse.success(res, withRemaining);
-      }
-      return apiResponse.success(res, screenings);
+      return apiResponse.success(
+        res,
+        screenings.map((screening) => ({
+          id: screening.id,
+          movie: screening.movie,
+          room: screening.room,
+          startsAt: screening.startsAt,
+          capacity: screening.capacity,
+          price: screening.price.cents,
+          remaining: screening.remainingSeats(),
+        })),
+      );
     }),
   );
 
@@ -42,7 +42,17 @@ export const screeningRouter = (
         tarif,
       );
 
-      return apiResponse.create(res, result);
+      return apiResponse.create(res, {
+        id: result.id,
+        screeningId: result.screeningId,
+        email: result.email.value,
+        seats: result.seats.value,
+        tariff: result.tariff,
+        total: result.total.cents,
+        status: result.getStatus(),
+        createdAt: result.createdAt,
+        cancelledAt: result.getCancelledAt(),
+      });
     }),
   );
 

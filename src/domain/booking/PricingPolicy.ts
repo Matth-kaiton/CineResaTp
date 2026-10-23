@@ -3,8 +3,8 @@ import Money from "../shared/Money";
 import SeatCounts from "./SeatCount";
 
 export default class PricingPolicy {
-  static readonly STUDENT_DISCOUNT = 0.7;
-  static readonly GROUP_DISCOUNT = 0.9;
+  static readonly STUDENT_DISCOUNT = 0.3;
+  static readonly GROUP_DISCOUNT = 0.1;
 
   static calculatePrice(
     unitPrice: Money,

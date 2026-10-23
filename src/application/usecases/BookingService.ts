@@ -1,27 +1,21 @@
 import Booking from "../../domain/booking/Booking";
 import ErrorResponse from "../../domain/errorResponse";
 import { UserStatus } from "../../domain/enum/UserStatuts";
-import { BookingStatus } from "../../domain/enum/BookingStatus";
 import MakeBooking from "../ports/in/MakeBooking";
 import { BookingRepository } from "../ports/out/BookingRepository";
-import { ScreeningRepository } from "../ports/out/ScreeningRepository";
 import { ScreeningService } from "./ScreeningService";
 import { NotifyPort } from "../ports/out/NotifyPort";
 import { PaymentPort } from "../ports/out/PaymentPort";
-import { calculatePrice } from "../../domain/booking/price";
 import CancelBooking from "../ports/in/CancelBooking";
 import ListMyBookings from "../ports/in/ListMyBookings";
-import { Screening } from "../../domain/booking/Screening";
 import Email from "../../domain/shared/Email";
 import SeatCounts from "../../domain/booking/SeatCount";
-import PricingPolicy from "../../domain/booking/PricingPolicy";
 
 export class BookingService
   implements MakeBooking, CancelBooking, ListMyBookings
 {
   constructor(
     private readonly screeningService: ScreeningService,
-    private readonly screeningRepo: ScreeningRepository,
     private readonly bookingRepo: BookingRepository,
     private readonly mailer: NotifyPort,
     private readonly payment: PaymentPort,
@@ -30,39 +24,30 @@ export class BookingService
 
   async makeBooking(
     screeningId: string,
-    email: Email,
-    seats: SeatCounts,
-    tarif: UserStatus = UserStatus.NORMAL,
+    email: Email | string,
+    seats: SeatCounts | number,
+    tarif: UserStatus | "NORMAL" | "STUDENT" = UserStatus.NORMAL,
   ): Promise<Booking> {
     const screening = await this.screeningService.getScreeningById(screeningId);
     if (!screening) {
       throw new ErrorResponse("Screening not found", 404);
     }
     const now = this.clock.now();
-
-    await this.validateScreening(screening, seats, now);
-
-    const totalPrice = PricingPolicy.calculatePrice(
-      screening.price,
-      seats,
-      tarif,
-    );
-    const paid = await this.payment.pay(totalPrice);
+    const booking = screening.book({
+      bookingId: "b" + Date.now(),
+      email: typeof email === "string" ? new Email(email) : email,
+      seats: typeof seats === "number" ? new SeatCounts(seats) : seats,
+      tariff:
+        tarif.toUpperCase() === "STUDENT"
+          ? UserStatus.STUDENT
+          : UserStatus.NORMAL,
+      now,
+    });
+    const paid = await this.payment.pay(booking.total);
 
     if (!paid) {
       throw new ErrorResponse("Payment failed", 402);
     }
-
-    const booking = new Booking(
-      "b" + Date.now(),
-      screening.id,
-      email,
-      seats,
-      tarif,
-      totalPrice,
-      BookingStatus.CONFIRMED,
-      now,
-    );
 
     await this.bookingRepo.save(booking);
 
@@ -71,37 +56,19 @@ export class BookingService
     return booking;
   }
 
-  private async validateScreening(
-    screening: Screening,
-    seats: SeatCounts,
-    now: Date,
-  ) {
-    if (new Date(screening.startsAt) <= now) {
-      throw new ErrorResponse("Screening has already started", 409);
-    }
-
-    const remainingSeats =
-      await this.screeningRepo.countRemainingSeats(screening);
-    if (remainingSeats < seats.value) {
-      throw new ErrorResponse("Not enough seats available", 409);
-    }
-  }
-
   async cancelBooking(bookingId: string): Promise<Booking> {
-    let booking = await this.bookingRepo.findById(bookingId);
-    if (!booking) {
+    const existingBooking = await this.bookingRepo.findById(bookingId);
+    if (!existingBooking) {
       throw new ErrorResponse("Booking not found", 404);
     }
     const screening = await this.screeningService.getScreeningById(
-      booking.screeningId,
+      existingBooking.screeningId,
     );
     if (!screening) {
       throw new ErrorResponse("Screening not found", 404);
     }
-
     const now = this.clock.now();
-
-    booking = booking.cancel(now, screening.startsAt);
+    const booking = screening.cancel(bookingId, now);
 
     const saved = await this.bookingRepo.save(booking);
 

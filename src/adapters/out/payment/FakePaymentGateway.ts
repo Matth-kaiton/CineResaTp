@@ -1,11 +1,12 @@
 import { PaymentPort } from "../../../application/ports/out/PaymentPort";
+import Money from "../../../domain/shared/Money";
 
 export default class FakePaymentGateway implements PaymentPort {
   constructor(
-    private readonly succeeds: (price: number) => boolean = () => true,
+    private readonly succeeds: (price: Money) => boolean = () => true,
   ) {}
 
-  async pay(price: any): Promise<boolean> {
+  async pay(price: Money): Promise<boolean> {
     return this.succeeds(price);
   }
 }

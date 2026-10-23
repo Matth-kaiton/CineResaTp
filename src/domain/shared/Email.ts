@@ -5,7 +5,7 @@ export default class Email {
   constructor(raw: string) {
     const value = raw.toLowerCase().trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
-      throw new ErrorResponse("Email invalide", 406);
+      throw new ErrorResponse("Email invalide", 400);
     }
     this.value = value;
   }

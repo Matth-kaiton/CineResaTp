@@ -3,11 +3,41 @@ import { BookingService } from "../src/application/usecases/BookingService";
 import { UserStatus } from "../src/domain/enum/UserStatuts";
 import { BookingStatus } from "../src/domain/enum/BookingStatus";
 import { ScreeningService } from "../src/application/usecases/ScreeningService";
-import { ScreeningRepository } from "../src/application/ports/out/ScreeningRepository";
 import { BookingRepository } from "../src/application/ports/out/BookingRepository";
 import { NotifyPort } from "../src/application/ports/out/NotifyPort";
 import { PaymentPort } from "../src/application/ports/out/PaymentPort";
 import ErrorResponse from "../src/domain/errorResponse";
+import Screening from "../src/domain/booking/Screening";
+import { BookingSnapshot } from "../src/domain/booking/Booking";
+
+const makeScreening = (
+  startsAt: Date,
+  bookings: BookingSnapshot[] = [],
+  capacity = 50,
+): Screening =>
+  Screening.fromSnapshot({
+    id: "s1",
+    movie: "Inception",
+    room: "Salle 1",
+    startsAt: startsAt.toISOString(),
+    capacity,
+    priceCents: 1000,
+    bookings,
+  });
+
+const bookingSnapshot = (
+  status: BookingStatus = BookingStatus.CONFIRMED,
+): BookingSnapshot => ({
+  id: "b1",
+  screeningId: "s1",
+  email: "matthias@ynov.com",
+  seats: 2,
+  tariff: UserStatus.NORMAL,
+  totalCents: 2000,
+  status,
+  createdAt: "2026-10-22T08:00:00.000Z",
+  cancelledAt: null,
+});
 
 // Squelette fourni : transformez chaque it.todo en vrai test.
 // Utilisez uniquement des adapters de test : InMemory…Repository, FakePaymentGateway(() => true/false),
@@ -16,7 +46,6 @@ describe("BookSeatsService", () => {
   let bookingService: BookingService;
 
   let fakeScreeningService: ScreeningService;
-  let fakeScreeningRepo: ScreeningRepository;
   let fakeBookingRepo: BookingRepository;
   let fakeMailer: NotifyPort;
   let fakePayment: PaymentPort;
@@ -27,19 +56,9 @@ describe("BookSeatsService", () => {
     const now = fakeClock.now();
 
     fakeScreeningService = {
-      getScreeningById: async (id: string) => ({
-        id: "s1",
-        movie: "Inception",
-        price: 1000,
-        startsAt: new Date(now.getTime() + 4 * 3600000),
-        capacity: 50,
-        room: "Salle 1",
-      }),
+      getScreeningById: async () =>
+        makeScreening(new Date(now.getTime() + 4 * 3600000)),
     } as unknown as ScreeningService;
-
-    fakeScreeningRepo = {
-      countRemainingSeats: async () => 20,
-    } as unknown as ScreeningRepository;
 
     fakeBookingRepo = {
       save: async (booking: any) => booking,
@@ -57,7 +76,6 @@ describe("BookSeatsService", () => {
 
     bookingService = new BookingService(
       fakeScreeningService,
-      fakeScreeningRepo,
       fakeBookingRepo,
       fakeMailer,
       fakePayment,
@@ -73,13 +91,18 @@ describe("BookSeatsService", () => {
       UserStatus.STUDENT,
     );
     expect(booking).toBeDefined();
-    expect(booking.seats).toBe(4);
-    expect(booking.total).toBe(2520);
+    expect(booking.seats.value).toBe(4);
+    expect(booking.total.cents).toBe(2520);
     expect(booking.status).toBe(BookingStatus.CONFIRMED);
     expect(fakeMailer.bookingConfirmed).toHaveBeenCalledTimes(1);
   });
   it("refuse si la capacité de la salle est dépassée", async () => {
-    fakeScreeningRepo.countRemainingSeats = async () => 2;
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(
+        new Date(fakeClock.now().getTime() + 4 * 3600000),
+        [],
+        2,
+      );
 
     try {
       await bookingService.makeBooking("s1", "matthias@ynov.com", 4);
@@ -89,14 +112,8 @@ describe("BookSeatsService", () => {
     }
   });
   it("refuse une séance déjà commencée (code CONFLICT)", async () => {
-    fakeScreeningService.getScreeningById = async () => ({
-      id: "s1",
-      movie: "Inception",
-      price: 1000,
-      startsAt: new Date(fakeClock.now().getTime() - 3600000),
-      room: "Salle 1",
-      capacity: 50,
-    });
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(new Date(fakeClock.now().getTime() - 3600000));
 
     try {
       await bookingService.makeBooking("s1", "matthias@ynov.com", 2);
@@ -125,14 +142,7 @@ describe("BookSeatsService", () => {
   it("refuse une séance inconnue (code NOT_FOUND)", async () => {
     fakeScreeningService.getScreeningById = async (id: string) => {
       if (id === "s99") return null;
-      return {
-        id: "s1",
-        movie: "Inception",
-        price: 1000,
-        startsAt: new Date(Date.now() + 3600000),
-        capacity: 50,
-        room: "Salle 1",
-      };
+      return makeScreening(new Date(Date.now() + 3600000));
     };
 
     try {
@@ -164,14 +174,11 @@ describe("BookSeatsService", () => {
   });
   it("annule avec succès une réservation plus de 2h avant la séance avec une horloge figée", async () => {
     const now = fakeClock.now();
-    fakeScreeningService.getScreeningById = async () => ({
-      id: "s1",
-      movie: "Inception",
-      price: 1000,
-      startsAt: new Date(now.getTime() + 4 * 3600000), // séance dans 4h
-      capacity: 50,
-      room: "Salle 1",
-    });
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(
+        new Date(now.getTime() + 4 * 3600000),
+        [bookingSnapshot()],
+      );
 
     const existingBooking = {
       id: "b1",
@@ -196,14 +203,11 @@ describe("BookSeatsService", () => {
   it("refuse d'annuler moins de 2h avant la séance (ex: 1h59) avec une horloge figée (code CONFLICT)", async () => {
     const now = fakeClock.now();
     // Séance dans 1h59 (119 minutes, donc < 2h)
-    fakeScreeningService.getScreeningById = async () => ({
-      id: "s1",
-      movie: "Inception",
-      price: 1000,
-      startsAt: new Date(now.getTime() + 119 * 60 * 1000),
-      capacity: 50,
-      room: "Salle 1",
-    });
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(
+        new Date(now.getTime() + 119 * 60 * 1000),
+        [bookingSnapshot()],
+      );
 
     const existingBooking = {
       id: "b1",
@@ -229,14 +233,11 @@ describe("BookSeatsService", () => {
   it("autorise l'annulation à la limite exacte des 2h avec une horloge figée", async () => {
     const now = fakeClock.now();
     // Séance dans 2h pile (120 minutes)
-    fakeScreeningService.getScreeningById = async () => ({
-      id: "s1",
-      movie: "Inception",
-      price: 1000,
-      startsAt: new Date(now.getTime() + 120 * 60 * 1000),
-      capacity: 50,
-      room: "Salle 1",
-    });
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(
+        new Date(now.getTime() + 120 * 60 * 1000),
+        [bookingSnapshot()],
+      );
 
     const existingBooking = {
       id: "b1",
@@ -256,6 +257,12 @@ describe("BookSeatsService", () => {
   });
 
   it("refuse d'annuler une réservation déjà annulée (code CONFLICT)", async () => {
+    fakeScreeningService.getScreeningById = async () =>
+      makeScreening(
+        new Date(fakeClock.now().getTime() + 4 * 3600000),
+        [bookingSnapshot(BookingStatus.CANCELLED)],
+      );
+
     const existingBooking = {
       id: "b1",
       screeningId: "s1",

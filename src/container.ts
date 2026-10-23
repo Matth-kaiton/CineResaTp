@@ -32,7 +32,6 @@ export function buildApp(adapters: Adapters): Express {
   const screeningService = new ScreeningService(adapters.screenings);
   const bookingService = new BookingService(
     screeningService,
-    adapters.screenings,
     adapters.bookings,
     adapters.notifier,
     adapters.payment,
@@ -41,7 +40,7 @@ export function buildApp(adapters: Adapters): Express {
 
   app.use(
     "/screenings",
-    screeningRouter(screeningService, bookingService, adapters.screenings),
+    screeningRouter(screeningService, bookingService),
   );
   app.use("/bookings", bookingRouter(bookingService, screeningService));
 

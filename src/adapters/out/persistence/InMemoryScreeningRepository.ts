@@ -1,27 +1,43 @@
 import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
-import { Screening } from "../../../domain/booking/Screening";
+import Screening, { ScreeningSchedule } from "../../../domain/booking/Screening";
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
+import Money from "../../../domain/shared/Money";
 
 export default class InMemoryScreeningRepository implements ScreeningRepository {
+  private readonly screenings: Screening[];
+
   constructor(
-    private screenings: Screening[],
+    screenings: Array<
+      Screening | (Omit<ScreeningSchedule, "unitPrice"> & { price: number })
+    >,
     private bookingRepository: BookingRepository,
-  ) {}
+  ) {
+    this.screenings = screenings.map((screening) =>
+      screening instanceof Screening
+        ? screening
+        : Screening.schedule({
+            ...screening,
+            unitPrice: new Money(screening.price),
+          }),
+    );
+  }
 
   async listUpcomingScreenings(): Promise<Screening[]> {
-    return this.screenings;
+    return Promise.all(this.screenings.map((screening) => this.hydrate(screening)));
   }
 
   async getById(id: string): Promise<Screening | null> {
     const screening = this.screenings.find((s) => s.id === id);
-    return screening || null;
+    return screening ? this.hydrate(screening) : null;
   }
 
-  async countRemainingSeats(screening: Screening): Promise<number> {
-    const totalSeats = screening.capacity || 0;
-    const bookedSeats = await this.bookingRepository.countConfirmedSeats(
+  private async hydrate(screening: Screening): Promise<Screening> {
+    const bookings = await this.bookingRepository.findByScreeningId(
       screening.id,
     );
-    return totalSeats - bookedSeats;
+    return Screening.fromSnapshot({
+      ...screening.toSnapshot(),
+      bookings: bookings.map((booking) => booking.toSnapshot()),
+    });
   }
 }

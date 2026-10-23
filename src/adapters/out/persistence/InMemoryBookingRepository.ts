@@ -1,17 +1,21 @@
 import { BookingRepository } from "../../../application/ports/out/BookingRepository";
 import { BookingStatus } from "../../../domain/enum/BookingStatus";
-import { Booking } from "../../../domain/booking/Booking";
+import Booking from "../../../domain/booking/Booking";
 
 export default class InMemoryBookingRepository implements BookingRepository {
   private bookings: Booking[] = [];
 
   async findByEmail(email: string): Promise<Booking[]> {
-    return this.bookings.filter((b) => b.email === email);
+    return this.bookings.filter((b) => b.email.value === email);
   }
 
   async findById(id: string): Promise<Booking | null> {
     const booking = this.bookings.find((b) => b.id === id);
     return booking || null;
+  }
+
+  async findByScreeningId(screeningId: string): Promise<Booking[]> {
+    return this.bookings.filter((booking) => booking.screeningId === screeningId);
   }
 
   async save(booking: Booking): Promise<Booking> {
@@ -31,8 +35,9 @@ export default class InMemoryBookingRepository implements BookingRepository {
   async countConfirmedSeats(screeningId: string): Promise<number> {
     const confirmedBookings = this.bookings.filter(
       (b) =>
-        b.screeningId === screeningId && b.status === BookingStatus.CONFIRMED,
+        b.screeningId === screeningId &&
+        b.getStatus() === BookingStatus.CONFIRMED,
     );
-    return confirmedBookings.reduce((sum, b) => sum + b.seats, 0);
+    return confirmedBookings.reduce((sum, b) => sum + b.seats.value, 0);
   }
 }

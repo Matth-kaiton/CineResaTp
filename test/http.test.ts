@@ -6,6 +6,7 @@ import FakePaymentGateway from "../src/adapters/out/payment/FakePaymentGateway";
 import { buildApp } from "../src/container";
 
 // Test de l'adapter HTTP : on branche l'app complète sur des adapters de test
+const bookingRepository = new InMemoryBookingRepository();
 const app = buildApp({
   screenings: new InMemoryScreeningRepository(
     [
@@ -18,9 +19,9 @@ const app = buildApp({
         price: 1000,
       },
     ],
-    new InMemoryBookingRepository(),
+    bookingRepository,
   ),
-  bookings: new InMemoryBookingRepository(),
+  bookings: bookingRepository,
   payment: new FakePaymentGateway(() => true),
   notifier: {
     sendNotification: async () => {},

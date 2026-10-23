@@ -24,6 +24,13 @@ export default class JsonBookingRepository implements BookingRepository {
     return this.toDomain(record);
   }
 
+  async findByScreeningId(screeningId: string): Promise<Booking[]> {
+    const data = this.file.read();
+    return data.bookings
+      .filter((booking) => booking.screeningId === screeningId)
+      .map((booking) => this.toDomain(booking));
+  }
+
   async save(booking: Booking): Promise<Booking> {
     const data = this.file.read();
     const record = this.toRecord(booking);

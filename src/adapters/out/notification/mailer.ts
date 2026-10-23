@@ -8,14 +8,14 @@ class Mailer implements NotifyPort {
 
   async bookingConfirmed(booking: Booking) {
     await this.sendNotification(
-      booking.email,
+      booking.email.value,
       `Your booking for screening ${booking.screeningId} is confirmed. Total: ${booking.total}`,
     );
   }
 
   async bookingCancelled(booking: Booking) {
     await this.sendNotification(
-      booking.email,
+      booking.email.value,
       `Your booking ${booking.id} has been cancelled.`,
     );
   }

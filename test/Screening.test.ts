@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BookingConfirmed } from "../src/domain/booking/events";
-import { Screening } from "../src/domain/booking/Screening";
+import Screening from "../src/domain/booking/Screening";
 import SeatCount from "../src/domain/booking/SeatCount";
 import Email from "../src/domain/shared/Email";
 import Money from "../src/domain/shared/Money";

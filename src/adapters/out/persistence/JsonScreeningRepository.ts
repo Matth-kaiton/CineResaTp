@@ -1,16 +1,22 @@
-import { Screening } from "../../../domain/booking/Screening";
+import Screening from "../../../domain/booking/Screening";
 import { ScreeningRepository } from "../../../application/ports/out/ScreeningRepository";
 import { JsonFile, ScreeningRecord } from "./JsonFile";
+import JsonBookingRepository from "./JsonBookingRepository";
 
 export default class JsonScreeningRepository implements ScreeningRepository {
-  constructor(private readonly file: JsonFile) {}
+  private readonly bookingRepository: JsonBookingRepository;
+
+  constructor(private readonly file: JsonFile) {
+    this.bookingRepository = new JsonBookingRepository(file);
+  }
 
   async listUpcomingScreenings(): Promise<Screening[]> {
     const data = this.file.read();
     const now = new Date();
-    return data.screenings
+    const upcoming = data.screenings
       .filter((s) => new Date(s.startsAt) >= now)
       .map((s) => this.toDomain(s));
+    return Promise.all(upcoming);
   }
 
   async getById(id: string): Promise<Screening | null> {
@@ -20,23 +26,16 @@ export default class JsonScreeningRepository implements ScreeningRepository {
     return this.toDomain(record);
   }
 
-  async countRemainingSeats(screening: Screening): Promise<number> {
-    const data = this.file.read();
-    const totalTaken = data.bookings
-      .filter((b) => b.screeningId === screening.id && b.status === "CONFIRMED")
-      .reduce((sum, b) => sum + b.seats, 0);
-
-    return screening.capacity - totalTaken;
-  }
-
-  private toDomain(record: ScreeningRecord): Screening {
-    return {
+  private async toDomain(record: ScreeningRecord): Promise<Screening> {
+    const bookings = await this.bookingRepository.findByScreeningId(record.id);
+    return Screening.fromSnapshot({
       id: record.id,
       movie: record.movie,
       room: record.room,
-      startsAt: new Date(record.startsAt),
+      startsAt: record.startsAt,
       capacity: record.capacity,
-      price: record.price,
-    };
+      priceCents: record.price,
+      bookings: bookings.map((booking) => booking.toSnapshot()),
+    });
   }
 }
